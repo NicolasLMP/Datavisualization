@@ -2,7 +2,7 @@ library(shiny)
 source("modules/emissions_by_sector_abs.R")
 
 ui <- navbarPage(
-  title = "Global CO₂ Dashboard",
+  title = "Greenhouse Gas Emissions",
   
   # Tab for Emissions
   tabPanel("Emissions by sectors",
