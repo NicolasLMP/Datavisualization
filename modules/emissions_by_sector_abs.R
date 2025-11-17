@@ -7,7 +7,7 @@ library(dygraphs)
 library(xts)
 
 # UI function
-mod_emissions_ui <- function(id) {
+mod_emissions_by_sectors_ui <- function(id) {
   ns <- NS(id)
   tagList(
     checkboxGroupInput(ns("sectors"), "Select sectors:",
@@ -20,11 +20,11 @@ mod_emissions_ui <- function(id) {
 }
 
 # Server function
-mod_emissions_server <- function(id) {
+mod_emissions_by_sectors_server <- function(id) {
   moduleServer(id, function(input, output, session) {
     
     # Load and prepare data
-    data <- read_excel("data/EDGAR_2024_GHG_booklet_2024.xlsx",
+    data <- read_excel("../data/EDGAR_2024_GHG_booklet_2024.xlsx",
                        sheet = "GHG_by_sector_and_country",
                        guess_max = 10000)
     
