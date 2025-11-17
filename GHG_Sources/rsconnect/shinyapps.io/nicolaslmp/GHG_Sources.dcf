@@ -1,0 +1,12 @@
+name: GHG_Sources
+title: GHG_Sources
+username: nicolaslmp
+account: nicolaslmp
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 15667606
+bundleId: 10997772
+url: https://nicolaslmp.shinyapps.io/GHG_Sources/
+version: 1
+asMultiple: FALSE
+asStatic: FALSE
