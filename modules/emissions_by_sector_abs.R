@@ -16,7 +16,7 @@ mod_emissions_by_sectors_abs_ui <- function(id) {
 }
 
 # Server function
-mod_emissions_by_sectors_abs_server <- function(id, sectors) {
+mod_emissions_by_sectors_abs_server <- function(id, sectors, countries) {
   moduleServer(id, function(input, output, session) {
     
     # Load and prepare data
@@ -24,17 +24,14 @@ mod_emissions_by_sectors_abs_server <- function(id, sectors) {
                        sheet = "GHG_by_sector_and_country",
                        guess_max = 10000)
     
-    # Filter global data
-    global_data <- subset(data, Country == "GLOBAL TOTAL")
-    
     # Pivot longer
-    long_data <- global_data %>%
+    long_data <- data %>%
       pivot_longer(cols = matches("^[0-9]{4}$"), names_to = "year", values_to = "value") %>%
       mutate(year = as.integer(year))
     
     # Aggregate by year, sector, and substance
     sector_gas_data <- long_data %>%
-      group_by(year, Sector, Substance) %>%
+      group_by(year, Sector, Substance, Country) %>%
       summarise(total = sum(value, na.rm = TRUE), .groups = "drop")
     
     # Pivot wider: each gas becomes a column
@@ -50,9 +47,10 @@ mod_emissions_by_sectors_abs_server <- function(id, sectors) {
     # Render Plotly chart
     output$plot <- renderPlotly({
       req(sectors())
+      req(countries())
       
       selected_data <- wide_sector_gas %>%
-        filter(Sector %in% sectors())
+        filter(Sector %in% sectors() & Country %in% countries())
       
       hover_text <- apply(selected_data, 1, function(row) {
         total <- as.numeric(row["CO2e"])

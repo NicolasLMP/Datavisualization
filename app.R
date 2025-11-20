@@ -13,22 +13,33 @@ ui <- navbarPage(
              # Row 1: selectors side by side
              fluidRow(
                column(
-                 width = 4,
+                 width = 2,
                  checkboxGroupInput(
-                   "shared_sectors_1", "Select sectors (Group 1):",
+                   "sectors", "Select sectors:",
                    choices = c("Agriculture", "Buildings", "Fuel Exploitation",
                                "Industrial Combustion", "Power Industry",
                                "Processes", "Transport", "Waste"),
                    selected = c("Industrial Combustion", "Power Industry")
+                 ),
+                 
+                 
+               ),
+               column(
+                 width = 5,
+                 selectInput(
+                   "countries_1", "Select Country:",
+                   choices = "Loading...",
+                   selected = ""
                  )
                ),
                column(
-                 width = 4,
+                 width = 5,
                  
-               ),
-               column(
-                 width = 4,
-                 
+                 selectInput(
+                   "countries_2", "Select Country:",
+                   choices = "Loading...",
+                   selected = ""
+                 )
                )
              ),
              
@@ -60,13 +71,24 @@ ui <- navbarPage(
 )
 
 server <- function(input, output, session) {
-  mod_emissions_by_sectors_abs_server("abs1", sectors = reactive(input$shared_sectors_1))
-  mod_emissions_by_sectors_rel_server("rel1", sectors = reactive(input$shared_sectors_1))
-  mod_emissions_by_sectors_rel_stacked_server("stacked1", sectors = reactive(input$shared_sectors_1))
+  data <- read_excel("data/EDGAR_2024_GHG_booklet_2024.xlsx",
+                     sheet = "GHG_by_sector_and_country")
   
-  mod_emissions_by_sectors_abs_server("abs2", sectors = reactive(input$shared_sectors_1))
-  mod_emissions_by_sectors_rel_server("rel2", sectors = reactive(input$shared_sectors_1))
-  mod_emissions_by_sectors_rel_stacked_server("stacked2", sectors = reactive(input$shared_sectors_1))
+  updateSelectInput(session, "countries_1",
+                    choices = sort(unique(data$Country)),
+                    selected = "GLOBAL TOTAL")
+  updateSelectInput(session, "countries_2",
+                    choices = sort(unique(data$Country)),
+                    selected = "Germany")
+  
+  
+  mod_emissions_by_sectors_abs_server("abs1", sectors = reactive(input$sectors), countries = reactive(input$countries_1))
+  mod_emissions_by_sectors_rel_server("rel1", sectors = reactive(input$sectors), countries = reactive(input$countries_1))
+  mod_emissions_by_sectors_rel_stacked_server("stacked1", sectors = reactive(input$sectors), countries = reactive(input$countries_1))
+  
+  mod_emissions_by_sectors_abs_server("abs2", sectors = reactive(input$sectors), countries = reactive(input$countries_2))
+  mod_emissions_by_sectors_rel_server("rel2", sectors = reactive(input$sectors), countries = reactive(input$countries_2))
+  mod_emissions_by_sectors_rel_stacked_server("stacked2", sectors = reactive(input$sectors), countries = reactive(input$countries_2))
   
 }
 

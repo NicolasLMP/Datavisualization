@@ -15,7 +15,7 @@ mod_emissions_by_sectors_rel_stacked_ui <- function(id) {
   )
 }
 
-mod_emissions_by_sectors_rel_stacked_server <- function(id, sectors) {
+mod_emissions_by_sectors_rel_stacked_server <- function(id, sectors, countries) {
   moduleServer(id, function(input, output, session) {
     
     # Load and prepare data
@@ -23,14 +23,12 @@ mod_emissions_by_sectors_rel_stacked_server <- function(id, sectors) {
                        sheet = "GHG_by_sector_and_country",
                        guess_max = 10000)
     
-    global_data <- subset(data, Country == "GLOBAL TOTAL")
-    
-    long_data <- global_data %>%
+    long_data <- data %>%
       pivot_longer(cols = matches("^[0-9]{4}$"), names_to = "year", values_to = "value") %>%
       mutate(year = as.integer(year))
     
     sector_gas_data <- long_data %>%
-      group_by(year, Sector, Substance) %>%
+      group_by(year, Sector, Substance, Country) %>%
       summarise(total = sum(value, na.rm = TRUE), .groups = "drop")
     
     wide_sector_gas <- sector_gas_data %>%
@@ -42,16 +40,17 @@ mod_emissions_by_sectors_rel_stacked_server <- function(id, sectors) {
     
     # Compute relative values (% of total per year)
     wide_sector_gas <- wide_sector_gas %>%
-      group_by(year) %>%
+      group_by(year, Country) %>%
       mutate(year_total = sum(CO2e, na.rm = TRUE),
              relative = (CO2e / year_total) * 100) %>%
       ungroup()
     
     output$plot <- renderPlotly({
       req(sectors())
+      req(countries())
       
       selected_data <- wide_sector_gas %>%
-        filter(Sector %in% sectors())
+        filter(Sector %in% sectors() & Country %in% countries())
       
       hover_text <- apply(selected_data, 1, function(row) {
         paste0(
