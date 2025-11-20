@@ -13,7 +13,7 @@ ui <- navbarPage(
              # Row 1: selectors side by side
              fluidRow(
                column(
-                 width = 6,
+                 width = 4,
                  checkboxGroupInput(
                    "shared_sectors_1", "Select sectors (Group 1):",
                    choices = c("Agriculture", "Buildings", "Fuel Exploitation",
@@ -23,14 +23,12 @@ ui <- navbarPage(
                  )
                ),
                column(
-                 width = 6,
-                 checkboxGroupInput(
-                   "shared_sectors_2", "Select sectors (Group 2):",
-                   choices = c("Agriculture", "Buildings", "Fuel Exploitation",
-                               "Industrial Combustion", "Power Industry",
-                               "Processes", "Transport", "Waste"),
-                   selected = c("Industrial Combustion", "Power Industry")
-                 )
+                 width = 4,
+                 
+               ),
+               column(
+                 width = 4,
+                 
                )
              ),
              
@@ -66,9 +64,9 @@ server <- function(input, output, session) {
   mod_emissions_by_sectors_rel_server("rel1", sectors = reactive(input$shared_sectors_1))
   mod_emissions_by_sectors_rel_stacked_server("stacked1", sectors = reactive(input$shared_sectors_1))
   
-  mod_emissions_by_sectors_abs_server("abs2", sectors = reactive(input$shared_sectors_2))
-  mod_emissions_by_sectors_rel_server("rel2", sectors = reactive(input$shared_sectors_2))
-  mod_emissions_by_sectors_rel_stacked_server("stacked2", sectors = reactive(input$shared_sectors_2))
+  mod_emissions_by_sectors_abs_server("abs2", sectors = reactive(input$shared_sectors_1))
+  mod_emissions_by_sectors_rel_server("rel2", sectors = reactive(input$shared_sectors_1))
+  mod_emissions_by_sectors_rel_stacked_server("stacked2", sectors = reactive(input$shared_sectors_1))
   
 }
 

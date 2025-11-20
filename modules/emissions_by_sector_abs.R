@@ -72,7 +72,21 @@ mod_emissions_by_sectors_abs_server <- function(id, sectors) {
         )
       })
       
-      plot_ly(selected_data, x = ~year, y = ~CO2e, color = ~Sector,
+      sector_colors <- c(
+        "Agriculture"           = "#4DC3B3",  # teal-green
+        "Buildings"             = "#F28E5C",  # soft orange
+        "Fuel Exploitation"     = "#6574B9",  # blue-purple
+        "Industrial Combustion" = "#D970C4",  # pink-magenta
+        "Power Industry"        = "#A7CE47",  # yellow-green
+        "Processes"             = "#F1D54A",  # yellow
+        "Transport"             = "#E9BE86",  # beige/light orange
+        "Waste"                 = "#B5B5B5"   # grey
+      )
+      
+      sector_colors <- sector_colors[names(sector_colors) %in% unique(selected_data$Sector)]
+
+      
+      plot_ly(selected_data, x = ~year, y = ~CO2e, color = ~Sector, colors=sector_colors,
               type = 'scatter', mode = 'lines+markers',
               text = hover_text, hoverinfo = 'text') %>%
         layout(title = "Global GHG Emissions by Sector (CO₂e)",
