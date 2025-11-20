@@ -11,16 +11,11 @@ library(plotly)
 mod_emissions_by_sectors_rel_ui <- function(id) {
   ns <- NS(id)
   tagList(
-    checkboxGroupInput(ns("sectors"), "Select sectors:",
-                       choices = c("Agriculture", "Buildings", "Fuel Exploitation",
-                                   "Industrial Combustion", "Power Industry",
-                                   "Processes", "Transport", "Waste"),
-                       selected = c("Industrial Combustion", "Power Industry")),
     plotlyOutput(ns("plot"))
   )
 }
 
-mod_emissions_by_sectors_rel_server <- function(id) {
+mod_emissions_by_sectors_rel_server <- function(id, sectors) {
   moduleServer(id, function(input, output, session) {
     
     # Load and prepare data
@@ -54,10 +49,10 @@ mod_emissions_by_sectors_rel_server <- function(id) {
     
     # Render Plotly chart
     output$plot <- renderPlotly({
-      req(input$sectors)
+      req(sectors())
       
       selected_data <- wide_sector_gas %>%
-        filter(Sector %in% input$sectors)
+        filter(Sector %in% sectors())
       
       hover_text <- apply(selected_data, 1, function(row) {
         paste0(
