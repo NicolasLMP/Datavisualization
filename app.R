@@ -7,7 +7,7 @@ source("modules/emissions_by_sector_rel_stacked.R")
 ui <- navbarPage(
   title = "Greenhouse Gas Emissions",
   
-  tabPanel("Emissions",
+  tabPanel("Emissions by Sector",
            fluidPage(
              
              # Row 1: selectors side by side

@@ -87,7 +87,7 @@ mod_emissions_by_sectors_abs_server <- function(id, sectors, countries) {
       plot_ly(selected_data, x = ~year, y = ~CO2e, color = ~Sector, colors=sector_colors,
               type = 'scatter', mode = 'lines+markers',
               text = hover_text, hoverinfo = 'text') %>%
-        layout(title = "Global GHG Emissions by Sector (CO₂e)",
+        layout(title = paste("GHG Emissions by Sector for", paste(countries(), collapse = ", ")),
                xaxis = list(title = "Year"),
                yaxis = list(title = "Emissions (Mt CO₂e)"))
       

@@ -79,7 +79,7 @@ mod_emissions_by_sectors_rel_stacked_server <- function(id, sectors, countries) 
               type = 'scatter', mode = 'lines',  # lines only
               stackgroup = 'one',  # still stacks values
               text = hover_text, hoverinfo = 'text') %>%
-        layout(title = "Global GHG Emissions by Sector (relative (%), stacked)",
+        layout(title = paste("GHG Emissions (% stacked) by Sector for", paste(countries(), collapse = ", ")),
                xaxis = list(title = "Year"),
                yaxis = list(title = "Share of Total Emissions (%)", range = c(0, 100)))
     })

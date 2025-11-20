@@ -79,7 +79,7 @@ mod_emissions_by_sectors_rel_server <- function(id, sectors, countries) {
       plot_ly(selected_data, x = ~year, y = ~relative, color = ~Sector, colors = sector_colors,
               type = 'scatter', mode = 'lines+markers',
               text = hover_text, hoverinfo = 'text') %>%
-        layout(title = "Global GHG Emissions by Sector (relative %)",
+        layout(title = paste("GHG Emissions (%) by Sector for", paste(countries(), collapse = ", ")),
                xaxis = list(title = "Year"),
                yaxis = list(title = "Share of Total Emissions (%)"))
     })
