@@ -8,24 +8,49 @@ ui <- navbarPage(
   title = "Greenhouse Gas Emissions",
   
   tabPanel("Emissions",
-    fluidPage(
-      # Shared input for all modules
-      checkboxGroupInput("shared_sectors", "Select sectors:",
-                         choices = c("Agriculture", "Buildings", "Fuel Exploitation",
-                                     "Industrial Combustion", "Power Industry",
-                                     "Processes", "Transport", "Waste"),
-                         selected = c("Industrial Combustion", "Power Industry")),
-       # Three plots in the same page
-       fluidRow(
-         column(12, mod_emissions_by_sectors_rel_ui("rel"))
-       ),
-       fluidRow(
-         column(12, mod_emissions_by_sectors_abs_ui("abs"))
-       ),
-       fluidRow(
-         column(12, mod_emissions_by_sectors_rel_stacked_ui("stacked"))
-       )    
-    )
+           fluidPage(
+             
+             # Row 1: selectors side by side
+             fluidRow(
+               column(
+                 width = 6,
+                 checkboxGroupInput(
+                   "shared_sectors_1", "Select sectors (Group 1):",
+                   choices = c("Agriculture", "Buildings", "Fuel Exploitation",
+                               "Industrial Combustion", "Power Industry",
+                               "Processes", "Transport", "Waste"),
+                   selected = c("Industrial Combustion", "Power Industry")
+                 )
+               ),
+               column(
+                 width = 6,
+                 checkboxGroupInput(
+                   "shared_sectors_2", "Select sectors (Group 2):",
+                   choices = c("Agriculture", "Buildings", "Fuel Exploitation",
+                               "Industrial Combustion", "Power Industry",
+                               "Processes", "Transport", "Waste"),
+                   selected = c("Industrial Combustion", "Power Industry")
+                 )
+               )
+             ),
+             
+             br(),
+             fluidRow(
+               column(6, mod_emissions_by_sectors_abs_ui("abs1")),
+               column(6, mod_emissions_by_sectors_abs_ui("abs2"))
+             ),
+             br(),
+             fluidRow(
+               column(6, mod_emissions_by_sectors_rel_ui("rel1")),
+               column(6, mod_emissions_by_sectors_rel_ui("rel2"))
+             ),
+             br(),
+             fluidRow(
+               column(6, mod_emissions_by_sectors_rel_stacked_ui("stacked1")),
+               column(6, mod_emissions_by_sectors_rel_stacked_ui("stacked2"))
+             )
+           )
+           
   ),
   
   tabPanel("About",
@@ -37,9 +62,13 @@ ui <- navbarPage(
 )
 
 server <- function(input, output, session) {
-  mod_emissions_by_sectors_abs_server("abs", sectors = reactive(input$shared_sectors))
-  mod_emissions_by_sectors_rel_server("rel", sectors = reactive(input$shared_sectors))
-  mod_emissions_by_sectors_rel_stacked_server("stacked", sectors = reactive(input$shared_sectors))
+  mod_emissions_by_sectors_abs_server("abs1", sectors = reactive(input$shared_sectors_1))
+  mod_emissions_by_sectors_rel_server("rel1", sectors = reactive(input$shared_sectors_1))
+  mod_emissions_by_sectors_rel_stacked_server("stacked1", sectors = reactive(input$shared_sectors_1))
+  
+  mod_emissions_by_sectors_abs_server("abs2", sectors = reactive(input$shared_sectors_2))
+  mod_emissions_by_sectors_rel_server("rel2", sectors = reactive(input$shared_sectors_2))
+  mod_emissions_by_sectors_rel_stacked_server("stacked2", sectors = reactive(input$shared_sectors_2))
   
 }
 
