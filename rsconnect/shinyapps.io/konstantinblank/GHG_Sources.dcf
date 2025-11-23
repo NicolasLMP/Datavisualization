@@ -5,7 +5,7 @@ account: konstantinblank
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 15667607
-bundleId: 11188954
+bundleId: 11209902
 url: https://konstantinblank.shinyapps.io/GHG_Sources/
 version: 1
 asMultiple: FALSE
