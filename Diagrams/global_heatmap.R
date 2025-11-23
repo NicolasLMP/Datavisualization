@@ -7,7 +7,11 @@ library(rnaturalearthdata)
 library(countrycode)
 library(htmltools)
 
-.edgar_hm <- read.csv("data/GHG_by_total_gdp_capita.csv", stringsAsFactors = FALSE)
+# Updated path to cleaned data
+.edgar_hm <- read.csv("data/data_cleaned/GHG_total_gdp_capita.csv", stringsAsFactors = FALSE)
+
+# Re-mapping columns using direct assignment to avoid issues
+colnames(.edgar_hm) <- c("country_code", "country", "year", "total_emissions_MtCO2e", "emissions_per_capita", "emissions_per_GDP")
 .edgar_hm$country_code <- toupper(trimws(.edgar_hm$country_code))
 .edgar_hm$country_clean <- .edgar_hm$country
 .edgar_hm$country_clean[.edgar_hm$country == "Spain and Andorra"] <- "Spain"
@@ -20,57 +24,34 @@ library(htmltools)
 mod_global_heatmap_ui <- function(id) {
   ns <- NS(id)
   tagList(
-    titlePanel("Global Emissions Choropleth Map"),
-    sidebarLayout(
-      sidebarPanel(
-        width = 3,
-        h4("Time Controls"),
-        sliderInput(ns("map_year"), "Year:", min = 1970, max = 2023, value = 2023,
-                    step = 1, sep = "", animate = animationOptions(interval = 1000, loop = TRUE)),
-        hr(),
-        h4("Metric"),
-        radioButtons(ns("map_metric"), NULL,
-                     choices = c("Total Emissions" = "total",
-                                 "Per Capita" = "per_capita",
-                                 "Per GDP" = "per_gdp"),
-                     selected = "total"),
-        hr(),
-        helpText("Hover over countries to see details"),
-        helpText("Color scale: Gold → Orange → Red (AFM hot palette)"),
-        conditionalPanel(
-          condition = sprintf("input['%s'] == 'per_gdp'", ns("map_metric")),
-          helpText("Note: Per GDP data only available from 1990 onwards")
-        )
-      ),
-      mainPanel(
-        width = 9,
-        leafletOutput(ns("choroplethMap"), height = "600px")
-      )
-    )
+    leafletOutput(ns("choroplethMap"), height = "600px")
   )
 }
 
-mod_global_heatmap_server <- function(id) {
+mod_global_heatmap_server <- function(id, map_year, map_metric) {
   moduleServer(id, function(input, output, session) {
     output$choroplethMap <- renderLeaflet({
-      metric_col <- switch(input$map_metric,
-                           "total" = "total_emissions_MtCO2e",
-                           "per_capita" = "emissions_per_capita",
-                           "per_gdp" = "emissions_per_GDP")
-      metric_label <- switch(input$map_metric,
-                             "total" = "MtCO2e",
-                             "per_capita" = "tCO2e/person",
-                             "per_gdp" = "kgCO2e/$")
+      metric_col <- switch(map_metric(),
+        "total" = "total_emissions_MtCO2e",
+        "per_capita" = "emissions_per_capita",
+        "per_gdp" = "emissions_per_GDP"
+      )
+      metric_label <- switch(map_metric(),
+        "total" = "MtCO2e",
+        "per_capita" = "tCO2e/person",
+        "per_gdp" = "kgCO2e/$"
+      )
 
       world <- ne_countries(scale = "medium", returnclass = "sf")
 
       country_emissions <- .edgar_hm |>
-        dplyr::filter(year == input$map_year) |>
+        dplyr::filter(year == map_year()) |>
         dplyr::mutate(
           iso_match = country_code,
           iso_match = ifelse(is.na(iso_match) | iso_match == "" | nchar(iso_match) != 3,
-                             countrycode(country_clean, origin = "country.name", destination = "iso3c"),
-                             iso_match),
+            countrycode(country_clean, origin = "country.name", destination = "iso3c"),
+            iso_match
+          ),
           iso_match = toupper(trimws(iso_match))
         ) |>
         dplyr::select(iso_match, country_clean, metric_value = dplyr::all_of(metric_col))
@@ -90,8 +71,9 @@ mod_global_heatmap_server <- function(id) {
         dplyr::mutate(
           value = dplyr::coalesce(value_iso, value_name),
           value_display = ifelse(is.na(value), "No data",
-                                 paste0(format(round(value, 2), big.mark = ","), " ", metric_label)),
-          tooltip = sprintf("<strong>%s</strong><br/>Year: %s<br/>%s", name, input$map_year, value_display)
+            paste0(format(round(value, 2), big.mark = ","), " ", metric_label)
+          ),
+          tooltip = sprintf("<strong>%s</strong><br/>Year: %s<br/>%s", name, map_year(), value_display)
         ) |>
         dplyr::select(-value_iso, -value_name)
 
@@ -104,20 +86,24 @@ mod_global_heatmap_server <- function(id) {
         addProviderTiles(providers$CartoDB.Positron) |>
         setView(lng = 0, lat = 20, zoom = 2) |>
         addPolygons(
-          fillColor = ~pal(value), fillOpacity = 0.7,
+          fillColor = ~ pal(value), fillOpacity = 0.7,
           color = "#FFFFFF", weight = 1,
-          highlightOptions = highlightOptions(weight = 3, color = "#000000",
-                                              fillOpacity = 0.9, bringToFront = TRUE),
+          highlightOptions = highlightOptions(
+            weight = 3, color = "#000000",
+            fillOpacity = 0.9, bringToFront = TRUE
+          ),
           label = lapply(world_data$tooltip, htmltools::HTML),
           labelOptions = labelOptions(
             style = list("font-weight" = "normal", padding = "3px 8px"),
             textsize = "13px", direction = "auto"
           )
         ) |>
-        addLegend(pal = pal, values = ~value,
-                  title = paste("Emissions (", metric_label, ")<br>Year:", input$map_year),
-                  position = "bottomright", opacity = 0.7,
-                  labFormat = labelFormat(big.mark = ","))
+        addLegend(
+          pal = pal, values = ~value,
+          title = paste("Emissions (", metric_label, ")<br>Year:", map_year()),
+          position = "bottomright", opacity = 0.7,
+          labFormat = labelFormat(big.mark = ",")
+        )
     })
   })
 }

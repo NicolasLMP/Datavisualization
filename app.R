@@ -1,53 +1,51 @@
 library(shiny)
 
-# Load modules
-source("Diagrams/emissions_by_sector_abs.R")
-source("Diagrams/emissions_by_region.R")
-source("Diagrams/global_heatmap.R")
-source("Diagrams/top_companies.R")
+# Load diagram modules
+source("diagrams/emissions_by_region.R")
+source("diagrams/global_heatmap.R")
+source("diagrams/top_companies.R")
+
+# Load page modules
+source("pages/page_regions.R")
+source("pages/page_heatmap.R")
+source("pages/page_companies.R")
 
 ui <- navbarPage(
   title = "Greenhouse Gas Emissions",
-  
-  tabPanel("Emissions by sectors",
-           fluidPage(
-             mod_emissions_by_sectors_ui("emissions_by_sector_abs")
-           )
+  tabPanel(
+    "Emissions by Region",
+    fluidPage(
+      mod_page_regions_ui("page_regions")
+    )
   ),
-  
-  tabPanel("Emissions by Region",
-           fluidPage(
-             mod_emissions_by_region_ui("emissions_by_region")
-           )
+  tabPanel(
+    "Global Heatmap",
+    fluidPage(
+      mod_page_heatmap_ui("page_heatmap")
+    )
   ),
-  
-  tabPanel("Global Heatmap",
-           fluidPage(
-             mod_global_heatmap_ui("global_heatmap")
-           )
+  tabPanel(
+    "Top Companies",
+    fluidPage(
+      mod_page_companies_ui("page_companies")
+    )
   ),
-  
-  tabPanel("Top Companies",
-           fluidPage(
-             mod_top_companies_ui("top_companies")
-           )
-  ),
-  
+
   # Info tab
-  tabPanel("About",
-           fluidPage(
-             h3("About this dashboard"),
-             p("This dashboard visualizes global CO₂ emissions by sector and region using EDGAR data.")
-           )
+  tabPanel(
+    "About",
+    fluidPage(
+      h3("About this dashboard"),
+      p("This dashboard visualizes global CO₂ emissions by sector and region using EDGAR data.")
+    )
   )
 )
 
 server <- function(input, output, session) {
-  # Module calls
-  mod_emissions_by_sectors_server("emissions_by_sector_abs")
-  mod_emissions_by_region_server("emissions_by_region")
-  mod_global_heatmap_server("global_heatmap")
-  mod_top_companies_server("top_companies")
+  # Call page modules
+  mod_page_regions_server("page_regions")
+  mod_page_heatmap_server("page_heatmap")
+  mod_page_companies_server("page_companies")
 }
 
 shinyApp(ui, server)
