@@ -42,6 +42,15 @@ mod_top_companies_server <- function(id, race_year, show_percentage, show_rank) 
         dplyr::slice_head(n = 10)
 
       total_all <- sum(company_totals$emissions, na.rm = TRUE)
+      top10_total <- sum(year_data$emissions, na.rm = TRUE)
+      top10_share <- ifelse(total_all > 0, (top10_total / total_all) * 100, NA_real_)
+
+      # Add "Top 10 Total" row
+      top10_row <- data.frame(
+        parent_entity = "Top 10 Total",
+        emissions = top10_total,
+        primary_commodity = "Top 10"
+      )
 
       # Add "All Companies" row
       all_companies_row <- data.frame(
@@ -50,10 +59,7 @@ mod_top_companies_server <- function(id, race_year, show_percentage, show_rank) 
         primary_commodity = "Total"
       )
 
-      year_data <- dplyr::bind_rows(all_companies_row, year_data)
-
-      top10_total <- sum(year_data$emissions[year_data$parent_entity != "All Companies"], na.rm = TRUE)
-      top10_share <- ifelse(total_all > 0, (top10_total / total_all) * 100, NA_real_)
+      year_data <- dplyr::bind_rows(all_companies_row, top10_row, year_data)
 
       # Create text shown at the top with the title
       caption_text <- sprintf(
@@ -64,22 +70,19 @@ mod_top_companies_server <- function(id, race_year, show_percentage, show_rank) 
         total_companies
       )
 
-      # Add rank and formatting
+      # Add rank and formatting (no percentages)
       year_data <- year_data |>
         dplyr::mutate(
-          percentage = ifelse(total_all > 0, (emissions / total_all) * 100, 0),
           rank = dplyr::row_number(),
           primary_commodity = ifelse(is.na(primary_commodity), "Other / Mixed", primary_commodity),
-          # Label logic: No percentage for "All Companies"
-          label = paste0(
-            round(emissions, 1), " MtCO2e",
-            ifelse(show_percentage() & parent_entity != "All Companies", paste0(" (", round(percentage, 1), "%)"), "")
-          )
+          # Label: emissions only (no percentages)
+          label = paste0(round(emissions, 1), " MtCO2e")
         )
 
       # Color palette
       commodity_colors <- c(
         "Total" = "#2C3E50", # Dark Blue/Grey for All Companies
+        "Top 10" = "#34495E", # Slightly lighter for Top 10 Total
         "Oil & NGL" = "#8B0000",
         "Natural Gas" = "#DC143C",
         "Bituminous Coal" = "#2F4F4F",
@@ -103,12 +106,11 @@ mod_top_companies_server <- function(id, race_year, show_percentage, show_rank) 
         geom_text(aes(y = emissions, label = label),
           hjust = "left", nudge_x = 0.05, size = 4
         ) +
-        scale_fill_manual(values = commodity_colors, name = "Primary Commodity") +
+        scale_fill_manual(values = commodity_colors, name = "Primary commodity") +
         coord_flip(clip = "off", expand = FALSE) +
         scale_y_continuous(labels = scales::comma, expand = c(0, 0)) +
         scale_x_reverse() +
         labs(
-          title = paste0("Top 10 Emitting Companies - ", race_year()),
           subtitle = caption_text,
           x = NULL,
           y = "Emissions (MtCO2e)"
@@ -129,14 +131,6 @@ mod_top_companies_server <- function(id, race_year, show_percentage, show_rank) 
           plot.background = element_rect(fill = "#FFFFFF", color = NA),
           panel.background = element_rect(fill = "#F8F9FA", color = NA)
         )
-
-      # Add rank numbers if requested
-      if (show_rank()) {
-        p <- p + geom_text(aes(y = 0, label = paste0("#", rank)),
-          hjust = "right", nudge_x = -0.5, size = 6,
-          fontface = "bold", color = "#333333"
-        )
-      }
 
       p
     })

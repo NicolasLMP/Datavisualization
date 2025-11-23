@@ -9,23 +9,24 @@ source("diagrams/top_companies.R")
 source("pages/page_regions.R")
 source("pages/page_heatmap.R")
 source("pages/page_companies.R")
+source("pages/page_about.R")
 
 ui <- navbarPage(
-  title = "Greenhouse Gas Emissions",
+  title = "Greenhouse gas emissions",
   tabPanel(
-    "Emissions by Region",
+    "Global",
     fluidPage(
       mod_page_regions_ui("page_regions")
     )
   ),
   tabPanel(
-    "Global Heatmap",
+    "Map",
     fluidPage(
       mod_page_heatmap_ui("page_heatmap")
     )
   ),
   tabPanel(
-    "Top Companies",
+    "Companies",
     fluidPage(
       mod_page_companies_ui("page_companies")
     )
@@ -35,8 +36,7 @@ ui <- navbarPage(
   tabPanel(
     "About",
     fluidPage(
-      h3("About this dashboard"),
-      p("This dashboard visualizes global CO₂ emissions by sector and region using EDGAR data.")
+      mod_page_about_ui("page_about")
     )
   )
 )
@@ -46,6 +46,7 @@ server <- function(input, output, session) {
   mod_page_regions_server("page_regions")
   mod_page_heatmap_server("page_heatmap")
   mod_page_companies_server("page_companies")
+  mod_page_about_server("page_about")
 }
 
 shinyApp(ui, server)

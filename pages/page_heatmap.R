@@ -3,7 +3,7 @@
 mod_page_heatmap_ui <- function(id) {
     ns <- NS(id)
     tagList(
-        titlePanel("Global Emissions Choropleth Map"),
+        titlePanel("Map of the green house gas emissions "),
         sidebarLayout(
             sidebarPanel(
                 width = 3,
@@ -24,7 +24,6 @@ mod_page_heatmap_ui <- function(id) {
                 ),
                 hr(),
                 helpText("Hover over countries to see details"),
-                helpText("Color scale: Gold → Orange → Red (AFM hot palette)"),
                 conditionalPanel(
                     condition = sprintf("input['%s'] == 'per_gdp'", ns("map_metric")),
                     helpText("Note: Per GDP data only available from 1990 onwards")
@@ -32,7 +31,18 @@ mod_page_heatmap_ui <- function(id) {
             ),
             mainPanel(
                 width = 9,
-                mod_global_heatmap_ui(ns("heatmap_plot"))
+                mod_global_heatmap_ui(ns("heatmap_plot")),
+                hr(),
+                wellPanel(
+                    style = "background-color: #f8f9fa;",
+                    h4("Research questions", style = "color: #2c3e50;"),
+                    tags$ul(
+                        tags$li("How have emission intensities changed geographically from 1970 to 2024?"),
+                        tags$li("Which regions show the most dramatic increases or decreases?"),
+                        tags$li("How does emission per GDP vary across countries in a given year?"),
+                        tags$li("Are there spatial clusters of high/low emitters?")
+                    )
+                )
             )
         )
     )

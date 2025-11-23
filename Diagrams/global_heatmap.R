@@ -79,14 +79,14 @@ mod_global_heatmap_server <- function(id, map_year, map_metric) {
 
       pal <- colorNumeric(
         palette = c("#FFD700", "#FFA500", "#FF6347", "#DC143C", "#8B0000"),
-        domain = world_data$value, na.color = "#D3D3D3"
+        domain = world_data$value, na.color = "#D3D3D3" # Light gray for missing data
       )
 
       leaflet(world_data) |>
-        addProviderTiles(providers$CartoDB.Positron) |>
+        addProviderTiles(providers$Esri.OceanBasemap) |> # Shows oceans in blue
         setView(lng = 0, lat = 20, zoom = 2) |>
         addPolygons(
-          fillColor = ~ pal(value), fillOpacity = 0.7,
+          fillColor = ~ pal(value), fillOpacity = 0.8,
           color = "#FFFFFF", weight = 1,
           highlightOptions = highlightOptions(
             weight = 3, color = "#000000",
