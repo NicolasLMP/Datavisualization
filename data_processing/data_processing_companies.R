@@ -13,5 +13,19 @@ companies_data <- read_csv(companies_path, show_col_types = FALSE)
 companies_cleaned <- companies_data %>%
     filter(parent_type != "Nation State")
 
+# Load OWID data for World emissions
+owid_path <- "data/owid-co2-data.csv"
+owid_data <- read_csv(owid_path, show_col_types = FALSE)
+
+# Extract World emissions
+# We select 'total_ghg' as the world emissions metric
+world_emissions <- owid_data %>%
+    filter(country == "World") %>%
+    select(year, world = total_ghg)
+
+# Join with companies data
+companies_with_world <- companies_cleaned %>%
+    left_join(world_emissions, by = "year")
+
 # Save the processed data
-write_csv(companies_cleaned, "data/GHG_by_sector_and_companies.csv")
+write_csv(companies_with_world, "data/data_cleaned/GHG_by_sector_and_companies.csv")

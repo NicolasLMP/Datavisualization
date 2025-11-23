@@ -2,7 +2,7 @@ library(tidyverse)
 library(readr)
 
 # Define file paths
-gdp_path <- "data/GHG-per_gdp_by_country.csv"
+gdp_path <- "data/GHG_per_gdp_by_country.csv"
 capita_path <- "data/GHG_per_capita_by_country.csv"
 total_path <- "data/GHG_totals_by_country.csv"
 
@@ -34,4 +34,4 @@ combined_data <- total_long %>%
     full_join(gdp_long, by = c("EDGAR Country Code", "Country", "year"))
 
 # Save the processed data
-write_csv(combined_data, "data/GHG_total_gdp_capita.csv")
+write_csv(combined_data, "data/data_cleaned/GHG_total_gdp_capita.csv")
