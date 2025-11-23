@@ -3,7 +3,7 @@
 mod_page_companies_ui <- function(id) {
     ns <- NS(id)
     tagList(
-        titlePanel("Top 10 Emitting Companies"),
+        titlePanel("Most emitting companies"),
         sidebarLayout(
             sidebarPanel(
                 width = 3,
@@ -18,15 +18,22 @@ mod_page_companies_ui <- function(id) {
                     animate = animationOptions(interval = 500, loop = FALSE)
                 ),
                 hr(),
-                h4("Display Options"),
-                checkboxInput(ns("show_percentage"), "Show percentage of total", value = TRUE),
-                checkboxInput(ns("show_rank"), "Show rank numbers", value = TRUE),
-                hr(),
                 helpText("Click play to see rankings change over time")
             ),
             mainPanel(
                 width = 9,
-                mod_top_companies_ui(ns("companies_plot"))
+                mod_top_companies_ui(ns("companies_plot")),
+                hr(),
+                wellPanel(
+                    style = "background-color: #f8f9fa;",
+                    h4("Research questions", style = "color: #2c3e50;"),
+                    tags$ul(
+                        tags$li("How do the top 10 emitters compare to the total?"),
+                        tags$li("What percentage of total emissions do the top 10 represent?"),
+                        tags$li("How have the rankings changed over time?"),
+                        tags$li("What is the concentration of emissions among major polluters?")
+                    )
+                )
             )
         )
     )
@@ -43,11 +50,11 @@ mod_page_companies_server <- function(id) {
             updateSliderInput(session, "race_year", min = min_year, max = max_year, value = max_year)
         }
 
-        # Call the diagram module
+        # Call the diagram module with fixed display options
         mod_top_companies_server("companies_plot",
             race_year = reactive(input$race_year),
-            show_percentage = reactive(input$show_percentage),
-            show_rank = reactive(input$show_rank)
+            show_percentage = reactive(TRUE), # Always show percentage
+            show_rank = reactive(FALSE) # Never show rank numbers
         )
     })
 }

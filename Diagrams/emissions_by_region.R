@@ -44,9 +44,7 @@ colnames(.edgar) <- c("country_code", "country", "year", "total_emissions_MtCO2e
 mod_emissions_by_region_ui <- function(id) {
   ns <- NS(id)
   tagList(
-    plotlyOutput(ns("emissionsPlot"), height = "600px"),
-    br(),
-    verbatimTextOutput(ns("emissionsInfo"))
+    plotlyOutput(ns("emissionsPlot"), height = "600px")
   )
 }
 
@@ -142,50 +140,6 @@ mod_emissions_by_region_server <- function(id, continents, countries, metric, ye
           legend = list(orientation = "v", x = 1.02, y = 1, bgcolor = "rgba(255,255,255,0.8)"),
           plot_bgcolor = "#F8F9FA", paper_bgcolor = "#FFFFFF"
         )
-    })
-
-    output$emissionsInfo <- renderText({
-      req(year_control())
-      metric_col <- switch(metric(),
-        "total" = "total_emissions_MtCO2e",
-        "per_capita" = "emissions_per_capita",
-        "per_gdp" = "emissions_per_GDP",
-        "accumulated" = "accumulated_emissions"
-      )
-
-      debug_msg <- ""
-
-      if ((metric() %in% c("total", "accumulated")) &&
-        !is.null(continents()) && length(continents()) > 0) {
-        cont_data <- .continent_data |>
-          dplyr::filter(continent %in% continents(), year <= year_control())
-
-        total <- cont_data |>
-          dplyr::summarise(total = sum(get(metric_col), na.rm = TRUE)) |>
-          dplyr::pull(total)
-
-        debug_msg <- paste0(
-          "Total for selected regions through ", year_control(), ":\n",
-          format(round(total, 2), big.mark = ","), " MtCO2e\n",
-          "Debug: Selected Continents: ", paste(continents(), collapse = ", "), "\n",
-          "Debug: Cont Data Rows: ", nrow(cont_data)
-        )
-      } else {
-        debug_msg <- paste0(
-          "Selected metric: ", metric(), "\n"
-        )
-      }
-
-      if (!is.null(countries()) && length(countries()) > 0) {
-        ctry_data <- .country_data |>
-          dplyr::filter(country %in% countries(), year <= year_control())
-        debug_msg <- paste0(
-          debug_msg, "\nDebug: Selected Countries: ", paste(countries(), collapse = ", "),
-          "\nDebug: Ctry Data Rows: ", nrow(ctry_data)
-        )
-      }
-
-      debug_msg
     })
   })
 }
