@@ -63,7 +63,17 @@ mod_top_companies_server <- function(id) {
         dplyr::slice_head(n = 10)
       
       total_all <- sum(company_totals$emissions, na.rm = TRUE)
-      top10_total <- sum(year_data$emissions, na.rm = TRUE)
+      
+      # Add "All Companies" row
+      all_companies_row <- data.frame(
+        parent_entity = "All Companies",
+        emissions = total_all,
+        primary_commodity = "Total"
+      )
+      
+      year_data <- dplyr::bind_rows(all_companies_row, year_data)
+      
+      top10_total <- sum(year_data$emissions[year_data$parent_entity != "All Companies"], na.rm = TRUE)
       top10_share <- ifelse(total_all > 0, (top10_total / total_all) * 100, NA_real_)
       
       # Create text shown at the top with the title
@@ -81,14 +91,16 @@ mod_top_companies_server <- function(id) {
           percentage = ifelse(total_all > 0, (emissions / total_all) * 100, 0),
           rank = dplyr::row_number(),
           primary_commodity = ifelse(is.na(primary_commodity), "Other / Mixed", primary_commodity),
+          # Label logic: No percentage for "All Companies"
           label = paste0(
             round(emissions, 1), " MtCO2e",
-            if (input$show_percentage) paste0(" (", round(percentage, 1), "%)") else ""
+            ifelse(input$show_percentage & parent_entity != "All Companies", paste0(" (", round(percentage, 1), "%)"), "")
           )
         )
       
       # Color palette
       commodity_colors <- c(
+        "Total" = "#2C3E50", # Dark Blue/Grey for All Companies
         "Oil & NGL" = "#8B0000",
         "Natural Gas" = "#DC143C",
         "Bituminous Coal" = "#2F4F4F",
@@ -115,16 +127,14 @@ mod_top_companies_server <- function(id) {
         scale_x_reverse() +
         labs(
           title = paste0("Top 10 Emitting Companies - ", input$race_year),
-          subtitle = caption_text,     # phrase affichée sous le titre
+          subtitle = caption_text,
           x = NULL,
           y = "Emissions (MtCO2e)"
-          # caption = "Source: Company-level emissions dataset" # optionnel
         ) +
         theme_minimal() +
         theme(
           plot.title = element_text(hjust = 0, size = 22, face = "bold", color = "#333333"),
           plot.subtitle = element_text(hjust = 0.5, size = 13, color = "#555555", margin = margin(b = 8)),
-          # plot.caption = element_text(hjust = 0.5, size = 12, color = "#555555", margin = margin(t = 10)),
           axis.text.y = element_blank(),
           axis.ticks.y = element_blank(),
           axis.text.x = element_text(size = 12),
