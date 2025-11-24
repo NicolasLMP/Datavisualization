@@ -30,5 +30,3 @@ wide_sector_gas <- wide_sector_gas %>%
   ungroup()
 
 write_csv(wide_sector_gas, "data/data_cleaned/GHG_by_sector_and_country.csv")
-
-unique(data$Substance)
