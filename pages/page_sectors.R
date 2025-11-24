@@ -49,10 +49,22 @@ mod_page_sectors_ui <- function(id) {
                   conditionalPanel(
                     condition = sprintf("input['%s'] == 'stacked'", ns("rel_plot_type")),
                     mod_emissions_by_sectors_rel_stacked_ui(ns("emissions_by_sectors_rel_stacked_plot"))
-                  )
+                  ),
                   
-                  # mod_emissions_by_sectors_rel_ui(ns("emissions_by_sectors_rel_plot")),
-                  # mod_emissions_by_sectors_rel_stacked_ui(ns("emissions_by_sectors_rel_stacked_plot"))
+                  hr(),
+                  wellPanel(
+                    style = "background-color: #f8f9fa;",
+                    h4("Research questions", style = "color: #2c3e50;"),
+                    tags$ul(
+                      tags$li("How are the sectors in relation to another?"),
+                      tags$li("What sectors are improving?"),
+                      tags$li("What sectors are very influential?"),
+                      tags$li("How do countries compare to another?"),
+                      tags$li("What are the emissions of the sectors in each country?"),
+                      tags$li("How is the gas distribution on a sector for a year?"),
+                      tags$li("How does the gas distribution on a sector develop over time?")
+                    )
+                  )
               )
           )
         ),

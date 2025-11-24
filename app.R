@@ -7,6 +7,8 @@ source("diagrams/top_companies.R")
 source("diagrams/emissions_by_sector_abs.R")
 source("diagrams/emissions_by_sector_rel.R")
 source("diagrams/emissions_by_sector_rel_stacked.R")
+source("diagrams/emissions_top_companies_vs_world.R")
+
 
 # Load page modules
 source("pages/page_regions.R")
