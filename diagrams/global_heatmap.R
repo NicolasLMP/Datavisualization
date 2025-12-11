@@ -1,30 +1,9 @@
-# modules/global_heatmap.R
-library(leaflet)
-library(sf)
-library(dplyr)
-library(rnaturalearth)
-library(rnaturalearthdata)
-library(countrycode)
-library(htmltools)
-
-# Updated path to cleaned data
-.edgar_hm <- read.csv("data/data_cleaned/GHG_total_gdp_capita.csv", stringsAsFactors = FALSE)
-
-# Re-mapping columns using direct assignment to avoid issues
-colnames(.edgar_hm) <- c("country_code", "country", "year", "total_emissions_MtCO2e", "emissions_per_capita", "emissions_per_GDP")
-.edgar_hm$country_code <- toupper(trimws(.edgar_hm$country_code))
-.edgar_hm$country_clean <- .edgar_hm$country
-.edgar_hm$country_clean[.edgar_hm$country == "Spain and Andorra"] <- "Spain"
-.edgar_hm$country_clean[.edgar_hm$country == "France and Monaco"] <- "France"
-.edgar_hm$country_clean[.edgar_hm$country == "Italy, San Marino and the Holy See"] <- "Italy"
-.edgar_hm$country_clean[.edgar_hm$country == "Switzerland and Liechtenstein"] <- "Switzerland"
-.edgar_hm$country_clean[.edgar_hm$country == "Denmark (with Faroe Islands and Greenland)"] <- "Denmark"
-.edgar_hm$country_clean[.edgar_hm$country == "Serbia and Montenegro"] <- "Serbia"
-
 mod_global_heatmap_ui <- function(id) {
   ns <- NS(id)
   tagList(
-    leafletOutput(ns("choroplethMap"), height = "600px")
+    # Set background color to match Esri Ocean Basemap to hide empty "placeholder" areas
+    tags$style(sprintf("#%s { background-color: #aad3df !important; }", ns("choroplethMap"))),
+    leafletOutput(ns("choroplethMap"), height = "500px")
   )
 }
 
@@ -42,20 +21,23 @@ mod_global_heatmap_server <- function(id, map_year, map_metric) {
         "per_gdp" = "kgCO2e/$"
       )
 
-      world <- ne_countries(scale = "medium", returnclass = "sf")
+      # Get world geometry
+      world <- ne_countries(scale = 110, returnclass = "sf")
 
+      # Prepare data
       country_emissions <- .edgar_hm |>
         dplyr::filter(year == map_year()) |>
         dplyr::mutate(
           iso_match = country_code,
           iso_match = ifelse(is.na(iso_match) | iso_match == "" | nchar(iso_match) != 3,
-            countrycode(country_clean, origin = "country.name", destination = "iso3c"),
+            countrycode::countrycode(country_clean, origin = "country.name", destination = "iso3c"),
             iso_match
           ),
           iso_match = toupper(trimws(iso_match))
         ) |>
         dplyr::select(iso_match, country_clean, metric_value = dplyr::all_of(metric_col))
 
+      # Aggregation
       emissions_by_iso <- country_emissions |>
         dplyr::filter(!is.na(iso_match)) |>
         dplyr::group_by(iso_match) |>
@@ -65,6 +47,7 @@ mod_global_heatmap_server <- function(id, map_year, map_metric) {
         dplyr::group_by(country_clean) |>
         dplyr::summarise(value_name = sum(metric_value, na.rm = TRUE), .groups = "drop")
 
+      # Join with world data
       world_data <- world |>
         dplyr::left_join(emissions_by_iso, by = c("iso_a3" = "iso_match")) |>
         dplyr::left_join(emissions_by_name, by = c("name_long" = "country_clean")) |>
@@ -77,14 +60,24 @@ mod_global_heatmap_server <- function(id, map_year, map_metric) {
         ) |>
         dplyr::select(-value_iso, -value_name)
 
+      # Color palette
       pal <- colorNumeric(
         palette = c("#FFD700", "#FFA500", "#FF6347", "#DC143C", "#8B0000"),
-        domain = world_data$value, na.color = "#D3D3D3" # Light gray for missing data
+        domain = world_data$value, na.color = "#D3D3D3"
       )
 
-      leaflet(world_data) |>
-        addProviderTiles(providers$Esri.OceanBasemap) |> # Shows oceans in blue
-        setView(lng = 0, lat = 20, zoom = 2) |>
+      # Create map
+      map <- leaflet(world_data, options = leafletOptions(
+        worldCopyJump = FALSE,
+        maxBoundsViscosity = 1.0,
+        minZoom = 1.5
+      )) %>%
+        addProviderTiles(providers$Esri.OceanBasemap, options = providerTileOptions(
+          noWrap = TRUE,
+          bounds = list(c(-90, -180), c(90, 180)) # Restrict tiles to valid world coordinates
+        )) %>%
+        setView(lng = 0, lat = 20, zoom = 2) %>%
+        setMaxBounds(lng1 = -179.9, lat1 = -89.9, lng2 = 179.9, lat2 = 89.9) %>%
         addPolygons(
           fillColor = ~ pal(value), fillOpacity = 0.8,
           color = "#FFFFFF", weight = 1,
@@ -97,13 +90,18 @@ mod_global_heatmap_server <- function(id, map_year, map_metric) {
             style = list("font-weight" = "normal", padding = "3px 8px"),
             textsize = "13px", direction = "auto"
           )
-        ) |>
-        addLegend(
-          pal = pal, values = ~value,
-          title = paste("Emissions (", metric_label, ")<br>Year:", map_year()),
-          position = "bottomright", opacity = 0.7,
-          labFormat = labelFormat(big.mark = ",")
         )
+
+      # Add Legend
+      map <- leaflet::addLegend(
+        map,
+        pal = pal, values = world_data$value,
+        title = paste("Emissions (", metric_label, ")<br>Year:", map_year()),
+        position = "bottomright", opacity = 0.7,
+        labFormat = labelFormat(big.mark = ",")
+      )
+
+      map
     })
   })
 }

@@ -58,7 +58,6 @@ server <- function(input, output, session) {
   mod_page_sectors_server("page_sectors")
   mod_page_companies_server("page_companies")
   mod_page_about_server("page_about")
-  
 }
 
 shinyApp(ui, server)
