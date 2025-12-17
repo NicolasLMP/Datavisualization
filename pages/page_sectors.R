@@ -1,9 +1,9 @@
-# pages/page_regions.R
+# pages/page_sectors.R
 
 mod_page_sectors_ui <- function(id) {
     ns <- NS(id)
     tagList(
-        titlePanel("Global emissions by sectors"),
+        titlePanel("Emissions by sectors and country"),
         
         # Comparison mode checkbox
         checkboxInput(ns("comparison_mode"), "Enable side-by-side comparison", value = FALSE),
