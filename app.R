@@ -7,6 +7,11 @@ library(tidyr)
 library(readr)
 library(rnaturalearth)
 library(sf)
+library(plotly)
+library(dygraphs)
+library(xts)
+library(purrr)
+library(readxl)
 
 # Load diagram modules
 source("diagrams/emissions_by_region.R")
