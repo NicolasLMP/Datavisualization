@@ -1,4 +1,12 @@
 library(shiny)
+library(bslib)
+library(leaflet)
+library(ggplot2)
+library(dplyr)
+library(tidyr)
+library(readr)
+library(rnaturalearth)
+library(sf)
 
 # Load diagram modules
 source("diagrams/emissions_by_region.R")
