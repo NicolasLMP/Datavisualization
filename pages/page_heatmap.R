@@ -1,5 +1,3 @@
-# pages/page_heatmap.R
-
 mod_page_heatmap_ui <- function(id) {
     ns <- NS(id)
     tagList(
@@ -10,11 +8,11 @@ mod_page_heatmap_ui <- function(id) {
                 h4("Time Controls"),
                 sliderInput(ns("map_year"), "Year:",
                     min = 1970, max = 2023, value = 2023,
-                    step = 1, sep = "", animate = animationOptions(interval = 1000, loop = TRUE)
+                    step = 1, sep = ""
                 ),
                 hr(),
                 h4("Metric"),
-                radioButtons(ns("map_metric"), NULL,
+                radioButtons(ns("map_metric"), "Select metric:",
                     choices = c(
                         "Total Emissions" = "total",
                         "Per Capita" = "per_capita",
@@ -23,10 +21,14 @@ mod_page_heatmap_ui <- function(id) {
                     selected = "total"
                 ),
                 hr(),
-                helpText("Hover over countries to see details"),
+                helpText(
+                    style = "margin-top: 15px; font-size: 0.9em; color: #7f8c8d;",
+                    icon("info-circle"),
+                    " Use the slider to explore specific years."
+                ),
                 conditionalPanel(
                     condition = sprintf("input['%s'] == 'per_gdp'", ns("map_metric")),
-                    helpText("Note: Per GDP data only available from 1990 onwards")
+                    helpText("Note: Per GDP data is available starting from 1990.")
                 )
             ),
             mainPanel(
@@ -50,10 +52,19 @@ mod_page_heatmap_ui <- function(id) {
 
 mod_page_heatmap_server <- function(id) {
     moduleServer(id, function(input, output, session) {
-        # Call the diagram module
+        # Call the heatmap plot module
         mod_global_heatmap_server("heatmap_plot",
             map_year = reactive(input$map_year),
             map_metric = reactive(input$map_metric)
         )
+
+        # Update year slider based on metric
+        observeEvent(input$map_metric, {
+            if (input$map_metric %in% c("per_capita", "per_gdp")) {
+                updateSliderInput(session, "map_year", min = 1990, value = max(1990, input$map_year))
+            } else {
+                updateSliderInput(session, "map_year", min = 1970)
+            }
+        })
     })
 }
