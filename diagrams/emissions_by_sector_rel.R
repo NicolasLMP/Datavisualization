@@ -51,9 +51,14 @@ mod_emissions_by_sectors_rel_server <- function(id, sectors, countries) {
       plot_ly(selected_data, x = ~year, y = ~relative, color = ~Sector, colors = sector_colors,
               type = 'scatter', mode = 'lines+markers',
               text = hover_text, hoverinfo = 'text') %>%
-        layout(title = paste("GHG Emissions (%) by Sector for", paste(countries(), collapse = ", ")),
-               xaxis = list(title = "Year"),
-               yaxis = list(title = "Share of Total Emissions (%)"))
+        config(modeBarButtonsToRemove = c("select2d", "lasso2d")) %>%
+        layout(title = paste0("How do the emission shares of ", paste(countries(), collapse = ", "), "'s sectors develop over time?"),
+               xaxis = list(title = "Year", fixedrange = TRUE),
+               yaxis = list(title = "Share of Total Emissions (%)", 
+                            fixedrange = TRUE,
+                            rangemode = "tozero",
+                            zerolinecolor="#EBEBEB")
+        )
     })
     
   })

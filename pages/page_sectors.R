@@ -30,9 +30,10 @@ mod_page_sectors_ui <- function(id) {
                   radioButtons(
                     ns("rel_plot_type"), "Select relative plot type:",
                     choices = c(
-                      "Relative (%)" = "rel",
-                      "Relative Stacked (%)" = "stacked"
+                      "Relative Stacked (%)" = "stacked",
+                      "Relative (%)" = "rel"
                     ),
+                    selected = "stacked",
                     inline = TRUE
                   )
               ),
