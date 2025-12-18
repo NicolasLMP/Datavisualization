@@ -1,5 +1,3 @@
-# pages/page_companies.R
-
 mod_page_companies_ui <- function(id) {
     ns <- NS(id)
     tagList(
@@ -7,25 +5,17 @@ mod_page_companies_ui <- function(id) {
         sidebarLayout(
             sidebarPanel(
                 width = 3,
-                h4("Time Controls"),
-                # We need to know the min/max year.
-                # Reading data here to set limits correctly or using safe defaults.
-                # Using 1970-2023 as safe default based on other files.
-                sliderInput(ns("race_year"), "Year:",
-                    min = 1854, max = 2022, # Approximate range for companies data
-                    value = 2022,
-                    step = 1, sep = "",
-                    animate = animationOptions(interval = 500, loop = FALSE)
-                ),
+                h4("Information"),
+                helpText("This page visualizes the top emitting companies."),
                 hr(),
-                helpText("Click play to see rankings change over time")
+                helpText("The animation on the right shows the evolution of the top 10 emitters over time (1970-2022)."),
+                hr(),
+                helpText("Note: The 'Vs World' comparison below uses data from the latest available year (2022).")
             ),
             mainPanel(
                 width = 9,
-                
                 h4("Top Companies vs World Emissions"),
                 mod_company_vs_world_ui(ns("companies_vs_world")),
-                                
                 mod_top_companies_ui(ns("companies_plot")),
                 hr(),
                 wellPanel(
@@ -35,7 +25,6 @@ mod_page_companies_ui <- function(id) {
                         tags$li("How do the world emissions develop over time?"),
                         tags$li("How do the summed up emissions of the top emitting companies develop over time?"),
                         tags$li("How do the summed up emissions of the top emitting companies develop over time in relation to the worlds emission?"),
-                      
                         tags$li("How do the top 10 emitters compare to the total?"),
                         tags$li("What percentage of total emissions do the top 10 represent?"),
                         tags$li("How have the rankings changed over time?"),
@@ -49,23 +38,17 @@ mod_page_companies_ui <- function(id) {
 
 mod_page_companies_server <- function(id) {
     moduleServer(id, function(input, output, session) {
-        # Update slider range based on actual data
-        data_path <- "data/data_cleaned/GHG_by_sector_and_companies.csv"
-        if (file.exists(data_path)) {
-            df <- read.csv(data_path, stringsAsFactors = FALSE)
-            min_year <- min(df$year, na.rm = TRUE)
-            max_year <- max(df$year, na.rm = TRUE)
-            updateSliderInput(session, "race_year", min = min_year, max = max_year, value = max_year)
-        }
-
-        # Call the diagram module with fixed display options
+        # Call the diagram module
+        # race_year is ignored by the GIF module, but we pass a dummy value
         mod_top_companies_server("companies_plot",
-            race_year = reactive(input$race_year),
-            show_percentage = reactive(TRUE), # Always show percentage
-            show_rank = reactive(FALSE) # Never show rank numbers
+            race_year = reactive(2022),
+            show_percentage = reactive(TRUE),
+            show_rank = reactive(FALSE)
         )
-        
-        mod_company_vs_world_server("companies_vs_world", 
-                                    race_year = reactive(input$race_year))
-        })
+
+        # Pass fixed year to the Vs World chart
+        mod_company_vs_world_server("companies_vs_world",
+            race_year = reactive(2022)
+        )
+    })
 }

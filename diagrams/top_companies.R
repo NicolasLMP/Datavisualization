@@ -1,138 +1,21 @@
-# modules/top_companies.R
-library(ggplot2)
-library(gganimate)
-library(dplyr)
-
-# Updated path to cleaned data
-.company_emissions <- read.csv("data/data_cleaned/GHG_by_sector_and_companies.csv", stringsAsFactors = FALSE)
-colnames(.company_emissions) <- gsub(" ", "_", colnames(.company_emissions))
+# diagrams/top_companies.R
 
 mod_top_companies_ui <- function(id) {
   ns <- NS(id)
   tagList(
-    plotOutput(ns("raceBarChart"), height = "700px")
+    tags$div(
+      style = "text-align: center; margin-bottom: 20px;",
+      tags$h3("Top 10 Emitting Companies (Evolution)"),
+      tags$img(
+        src = "companies_race.gif", style = "max-width: 100%; height: auto;",
+        alt = "Animation not generated. Please run scripts/generate_companies_gif.R"
+      )
+    )
   )
 }
 
 mod_top_companies_server <- function(id, race_year, show_percentage, show_rank) {
   moduleServer(id, function(input, output, session) {
-    output$raceBarChart <- renderPlot({
-      # Get data for selected year
-      company_totals <- .company_emissions |>
-        dplyr::filter(year == race_year()) |>
-        dplyr::group_by(parent_entity) |>
-        dplyr::summarise(emissions = sum(total_emissions_MtCO2e, na.rm = TRUE), .groups = "drop")
-
-      total_companies <- nrow(company_totals)
-
-      # Get dominant commodity
-      dominant_commodity <- .company_emissions |>
-        dplyr::filter(year == race_year()) |>
-        dplyr::group_by(parent_entity, commodity) |>
-        dplyr::summarise(commodity_emissions = sum(total_emissions_MtCO2e, na.rm = TRUE), .groups = "drop") |>
-        dplyr::group_by(parent_entity) |>
-        dplyr::slice_max(order_by = commodity_emissions, n = 1, with_ties = FALSE) |>
-        dplyr::ungroup() |>
-        dplyr::select(parent_entity, primary_commodity = commodity)
-
-      # Get top 10 and calculate stats
-      year_data <- company_totals |>
-        dplyr::left_join(dominant_commodity, by = "parent_entity") |>
-        dplyr::arrange(desc(emissions)) |>
-        dplyr::slice_head(n = 10)
-
-      total_all <- sum(company_totals$emissions, na.rm = TRUE)
-      top10_total <- sum(year_data$emissions, na.rm = TRUE)
-      top10_share <- ifelse(total_all > 0, (top10_total / total_all) * 100, NA_real_)
-
-      # Add "Top 10 Total" row
-      top10_row <- data.frame(
-        parent_entity = "Top 10 Total",
-        emissions = top10_total,
-        primary_commodity = "Top 10"
-      )
-
-      # Add "All Companies" row
-      all_companies_row <- data.frame(
-        parent_entity = "All Companies",
-        emissions = total_all,
-        primary_commodity = "Total"
-      )
-
-      year_data <- dplyr::bind_rows(all_companies_row, top10_row, year_data)
-
-      # Create text shown at the top with the title
-      caption_text <- sprintf(
-        "Top 10 emit %s MtCO2e (%.1f%%) out of %s MtCO2e total (%d companies)",
-        format(round(top10_total, 1), big.mark = ","),
-        top10_share,
-        format(round(total_all, 1), big.mark = ","),
-        total_companies
-      )
-
-      # Add rank and formatting (no percentages)
-      year_data <- year_data |>
-        dplyr::mutate(
-          rank = dplyr::row_number(),
-          primary_commodity = ifelse(is.na(primary_commodity), "Other / Mixed", primary_commodity),
-          # Label: emissions only (no percentages)
-          label = paste0(round(emissions, 1), " MtCO2e")
-        )
-
-      # Color palette
-      commodity_colors <- c(
-        "Total" = "#2C3E50", # Dark Blue/Grey for All Companies
-        "Top 10" = "#34495E", # Slightly lighter for Top 10 Total
-        "Oil & NGL" = "#8B0000",
-        "Natural Gas" = "#DC143C",
-        "Bituminous Coal" = "#2F4F4F",
-        "Anthracite Coal" = "#000000",
-        "Thermal Coal" = "#696969",
-        "Lignite Coal" = "#808080",
-        "SubBituminous Coal" = "#A9A9A9",
-        "Metallurgical Coal" = "#555555",
-        "Cement" = "#D3D3D3",
-        "Other / Mixed" = "#8B4513"
-      )
-
-      # Create the plot
-      p <- ggplot(year_data, aes(x = rank, fill = primary_commodity, group = parent_entity)) +
-        geom_tile(aes(y = emissions / 2, height = emissions, width = 0.9),
-          alpha = 0.9, color = "white", size = 1
-        ) +
-        geom_text(aes(y = 0, label = parent_entity),
-          hjust = "right", nudge_x = -0.1, size = 5, fontface = "bold"
-        ) +
-        geom_text(aes(y = emissions, label = label),
-          hjust = "left", nudge_x = 0.05, size = 4
-        ) +
-        scale_fill_manual(values = commodity_colors, name = "Primary commodity") +
-        coord_flip(clip = "off", expand = FALSE) +
-        scale_y_continuous(labels = scales::comma, expand = c(0, 0)) +
-        scale_x_reverse() +
-        labs(
-          subtitle = caption_text,
-          x = NULL,
-          y = "Emissions (MtCO2e)"
-        ) +
-        theme_minimal() +
-        theme(
-          plot.title = element_text(hjust = 0, size = 22, face = "bold", color = "#333333"),
-          plot.subtitle = element_text(hjust = 0.5, size = 13, color = "#555555", margin = margin(b = 8)),
-          axis.text.y = element_blank(),
-          axis.ticks.y = element_blank(),
-          axis.text.x = element_text(size = 12),
-          plot.margin = margin(1, 4, 1, 8, "cm"),
-          legend.position = "bottom",
-          legend.text = element_text(size = 10),
-          panel.grid.major.y = element_blank(),
-          panel.grid.minor.y = element_blank(),
-          panel.grid.major.x = element_line(color = "#E5E5E5"),
-          plot.background = element_rect(fill = "#FFFFFF", color = NA),
-          panel.background = element_rect(fill = "#F8F9FA", color = NA)
-        )
-
-      p
-    })
+    # Logic replaced by static GIF as per user request
   })
 }
