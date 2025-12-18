@@ -76,7 +76,13 @@ mod_emissions_by_region_server <- function(id, continents, countries, metric, ye
         country_filtered <- .country_data |> dplyr::filter(country %in% countries(), year <= year_control())
       }
 
-      continent_colors <- c("Africa" = "#D2691E", "Asia" = "#DC143C", "Europe" = "#4169E1", "Americas" = "#228B22", "Oceania" = "#9370DB")
+      continent_colors <- c(
+        "Africa"   = "#E9BE86", # Tan
+        "Asia"     = "#F28E5C", # Soft Orange
+        "Europe"   = "#6574B9", # Slate Blue
+        "Americas" = "#4DC3B3", # Teal
+        "Oceania"  = "#A7CE47"  # Lime
+      )
       plot <- plot_ly()
 
       if (!is.null(continent_filtered) && nrow(continent_filtered) > 0) {

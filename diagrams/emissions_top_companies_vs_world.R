@@ -69,7 +69,10 @@ mod_company_vs_world_server <- function(id, race_year) {
         ))
       
       # Define colors
-      cat_colors <- c("Top Emitting Companies" = "#6574B9", "World Total" = "#B5B5B5")
+      cat_colors <- c(
+        "Top Emitting Companies" = "#6574B9", 
+        "World Total"            = "#B5B5B5"
+      )
       
       plot_ly(
         df, x = ~year, y = ~Emissions, color = ~Category, colors = cat_colors,

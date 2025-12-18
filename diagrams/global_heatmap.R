@@ -61,9 +61,20 @@ mod_global_heatmap_server <- function(id, map_year, map_metric) {
         dplyr::select(-value_iso, -value_name)
 
       # Color palette
+      # A "Value-Linked" Heat Scale
+      # Light/Bright (Low Value) -> Dark/Saturated (High Value)
       pal <- colorNumeric(
-        palette = c("#FFD700", "#FFA500", "#FF6347", "#DC143C", "#8B0000"),
-        domain = world_data$value, na.color = "#D3D3D3"
+        palette = c(
+          "#FFF7BC", # Very low (Lightest Value)
+          "#FEE391", 
+          "#FEC44F", # Mid-low
+          "#FB9A29", # Mid (Matches your 'Orange' sector anchor)
+          "#EC7014", 
+          "#CC4C02", # High
+          "#802405"  # Very high (Darkest Value - heavy GHG)
+        ),
+        domain = world_data$value, 
+        na.color = "#F2F2F2" # Very light grey so it disappears into the map
       )
 
       # Create map
