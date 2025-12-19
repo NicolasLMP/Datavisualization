@@ -16,7 +16,8 @@ mod_page_heatmap_ui <- function(id) {
                     choices = c(
                         "Total Emissions" = "total",
                         "Per Capita" = "per_capita",
-                        "Per GDP" = "per_gdp"
+                        "Per GDP" = "per_gdp",
+                        "Total Accumulated" = "accumulated"
                     ),
                     selected = "total"
                 ),

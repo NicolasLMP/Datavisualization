@@ -30,12 +30,10 @@ source("pages/page_heatmap.R")
 source("pages/page_sectors.R")
 source("pages/page_companies.R")
 source("pages/page_about.R")
+source("pages/page_download.R")
 
-ui <- navbarPage(
-  title = tags$span(
-    icon("leaf"),
-    "GHG Emissions Dashboard"
-  ),
+# Define UI
+ui <- page_fluid(
   theme = bslib::bs_theme(
     version = 5,
     bg = "#ffffff",
@@ -46,58 +44,75 @@ ui <- navbarPage(
     danger = "#E63946",
     base_font = bslib::font_google("Inter")
   ),
-  tabPanel(
-    "Home",
-    icon = icon("home"),
-    fluidPage(
-      mod_page_home_ui("page_home")
-    )
+  tags$head(
+    tags$style(HTML("
+      /* Custom styles to ensure full height and better spacing */
+      html, body { height: 100%; }
+      .navbar { margin-bottom: 20px; }
+      .card { box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+    "))
   ),
-  tabPanel(
-    "Global",
-    icon = icon("globe-americas"),
-    fluidPage(
-      mod_page_regions_ui("page_regions")
-    )
-  ),
-  tabPanel(
-    "Map",
-    icon = icon("map-marked-alt"),
-    fluidPage(
-      mod_page_heatmap_ui("page_heatmap")
-    )
-  ),
-  tabPanel(
-    "Sectors",
-    icon = icon("industry"),
-    fluidPage(
-      mod_page_sectors_ui("page_sectors")
-    )
-  ),
-  tabPanel(
-    "Companies",
-    icon = icon("building"),
-    fluidPage(
-      mod_page_companies_ui("page_companies")
-    )
-  ),
-  tabPanel(
-    "About",
-    icon = icon("info-circle"),
-    fluidPage(
-      mod_page_about_ui("page_about")
+  navbarPage(
+    title = div(
+      icon("leaf", class = "fa-lg", style = "color: #2c3e50; margin-right: 10px;"),
+      span("GHG Emissions Dashboard", style = "font-weight: bold; color: #2c3e50;")
+    ),
+    id = "navbar",
+    collapsible = TRUE,
+
+    # Home Page
+    tabPanel("Home",
+      icon = icon("home"),
+      mod_page_home_ui("home")
+    ),
+
+    # Global Emissions
+    tabPanel("Global",
+      icon = icon("globe"),
+      mod_page_regions_ui("regions")
+    ),
+
+    # Map
+    tabPanel("Map",
+      icon = icon("map-marked-alt"),
+      mod_page_heatmap_ui("heatmap")
+    ),
+
+    # Sectors
+    tabPanel("Sectors",
+      icon = icon("industry"),
+      mod_page_sectors_ui("sectors")
+    ),
+
+    # Companies
+    tabPanel("Companies",
+      icon = icon("building"),
+      mod_page_companies_ui("companies")
+    ),
+
+    # Report / Download
+    tabPanel("Report",
+      icon = icon("file-download"),
+      mod_page_download_ui("download")
+    ),
+
+    # About
+    tabPanel("About",
+      icon = icon("info-circle"),
+      mod_page_about_ui("about")
     )
   )
 )
 
+# Define server logic
 server <- function(input, output, session) {
-  # Call page modules
-  mod_page_home_server("page_home")
-  mod_page_regions_server("page_regions")
-  mod_page_heatmap_server("page_heatmap")
-  mod_page_sectors_server("page_sectors")
-  mod_page_companies_server("page_companies")
-  mod_page_about_server("page_about")
+  # Call modules
+  mod_page_home_server("home")
+  mod_page_regions_server("regions")
+  mod_page_heatmap_server("heatmap")
+  mod_page_sectors_server("sectors")
+  mod_page_companies_server("companies")
+  mod_page_download_server("download")
+  mod_page_about_server("about")
 }
-
 shinyApp(ui, server)

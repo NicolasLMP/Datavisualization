@@ -73,7 +73,7 @@ p <- ggplot(df_top10) +
     panel.grid.major.y = element_blank(),
     panel.grid.minor = element_blank(),
     panel.grid.major.x = element_line(color = "gray90"),
-    plot.margin = margin(1, 3, 1, 7, "cm"),
+    plot.margin = margin(1, 4, 1, 10, "cm"),
     plot.background = element_rect(fill = "white", color = NA),
     panel.background = element_rect(fill = "white", color = NA),
     legend.position = "bottom",
@@ -81,7 +81,7 @@ p <- ggplot(df_top10) +
     legend.text = element_text(size = 10)
   ) +
   labs(
-    title = "Top 10 Emitting Companies",
+    title = "Who are the top 10 emitting companies?",
     subtitle = "Year: {closest_state}",
     x = NULL,
     y = "Total Emissions (MtCO2e)"

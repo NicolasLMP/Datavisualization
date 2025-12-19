@@ -75,26 +75,41 @@ mod_emissions_by_region_server <- function(id, continents, countries, metric, ye
       if (!is.null(countries()) && length(countries()) > 0) {
         country_filtered <- .country_data |> dplyr::filter(country %in% countries(), year <= year_control())
       }
+      metric_explanation <- switch(metric(),
+        "total" = "Total greenhouse gas emissions in Million tonnes of CO2 equivalent (MtCO2e).",
+        "per_capita" = "Average emissions per person (tCO2e/capita).",
+        "per_gdp" = "Emissions intensity relative to economic output (tCO2e/million $ GDP).",
+        "accumulated" = "Cumulative sum of annual emissions since the start of recording."
+      )
 
-      continent_colors <- c("Africa" = "#D2691E", "Asia" = "#DC143C", "Europe" = "#4169E1", "Americas" = "#228B22", "Oceania" = "#9370DB")
+      # Colors for continents
+      continent_colors <- c(
+        "Africa" = "#E63946", # Red
+        "Americas" = "#457B9D", # Blue
+        "Asia" = "#2A9D8F", # Teal
+        "Europe" = "#F4A261", # Orange
+        "Oceania" = "#264653" # Dark Blue
+      )
+
+      # Create plot
       plot <- plot_ly()
 
+      # Add continents
       if (!is.null(continent_filtered) && nrow(continent_filtered) > 0) {
         for (cont in unique(continent_filtered$continent)) {
           data_subset <- continent_filtered |> dplyr::filter(continent == cont)
-          y_values <- data_subset[[metric_col]]
-          x_values <- data_subset$year
+          base_color <- continent_colors[cont]
 
-          highlight_color <- continent_colors[cont]
-          if (is.na(highlight_color)) highlight_color <- "#1f77b4"
+          # Default fallback color
+          if (is.na(base_color)) base_color <- "#1f77b4"
 
           plot <- plot |>
             add_trace(
-              x = x_values, y = y_values,
+              x = data_subset$year, y = data_subset[[metric_col]],
               type = "scatter", mode = "lines+markers",
               name = cont,
-              line = list(color = highlight_color, width = 3),
-              marker = list(size = 6, color = highlight_color),
+              line = list(color = base_color, width = 4),
+              marker = list(size = 6, color = base_color),
               hovertemplate = paste(
                 "<b>", cont, "</b><br>",
                 "Year: %{x}<br>",
@@ -134,11 +149,43 @@ mod_emissions_by_region_server <- function(id, continents, countries, metric, ye
 
       plot |>
         layout(
-          xaxis = list(title = "Year", gridcolor = "#E5E5E5", range = c(1970, year_control())),
-          yaxis = list(title = metric_label, gridcolor = "#E5E5E5", rangemode = "tozero"),
+          title = list(
+            text = "How have emissions evolved over time?",
+            x = 0.05
+          ),
+          xaxis = list(
+            title = "Year",
+            gridcolor = "#E5E5E5",
+            range = c(1970, year_control()),
+            showline = TRUE,
+            linewidth = 2,
+            linecolor = "black",
+            mirror = TRUE
+          ),
+          yaxis = list(
+            title = metric_label,
+            gridcolor = "#E5E5E5",
+            rangemode = "tozero",
+            showline = TRUE,
+            linewidth = 2,
+            linecolor = "black",
+            mirror = TRUE
+          ),
+          annotations = list(
+            list(
+              x = 0,
+              y = 1.08,
+              xref = "paper",
+              yref = "paper",
+              text = paste0("<i>", metric_explanation, "</i>"),
+              showarrow = FALSE,
+              font = list(size = 12, color = "gray")
+            )
+          ),
           hovermode = "closest",
           legend = list(orientation = "v", x = 1.02, y = 1, bgcolor = "rgba(255,255,255,0.8)"),
-          plot_bgcolor = "#F8F9FA", paper_bgcolor = "#FFFFFF"
+          plot_bgcolor = "#F8F9FA", paper_bgcolor = "#FFFFFF",
+          margin = list(t = 80) # Add margin for title/explanation
         )
     })
   })
