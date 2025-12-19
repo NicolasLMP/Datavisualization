@@ -81,7 +81,7 @@ mod_emissions_by_region_server <- function(id, continents, countries, metric, ye
         "Asia"     = "#F28E5C", # Soft Orange
         "Europe"   = "#6574B9", # Slate Blue
         "Americas" = "#4DC3B3", # Teal
-        "Oceania"  = "#A7CE47"  # Lime
+        "Oceania"  = "#A7CE47" # Lime
       )
       plot <- plot_ly()
 
@@ -138,13 +138,54 @@ mod_emissions_by_region_server <- function(id, continents, countries, metric, ye
         }
       }
 
+      # Define metric explanations
+      metric_explanation <- switch(metric(),
+        "total" = "Total greenhouse gas emissions in Million tonnes of CO2 equivalent (MtCO2e).",
+        "per_capita" = "Average emissions per person (tCO2e/capita).",
+        "per_gdp" = "Emissions intensity relative to economic output (tCO2e/million $ GDP).",
+        "accumulated" = "Cumulative sum of annual emissions from start of dataset up to selected year."
+      )
+
+      # Update layout for titles, explanations, and axis lines
       plot |>
         layout(
-          xaxis = list(title = "Year", gridcolor = "#E5E5E5", range = c(1970, year_control())),
-          yaxis = list(title = metric_label, gridcolor = "#E5E5E5", rangemode = "tozero"),
+          title = list(
+            text = "How have emissions evolved over time?",
+            x = 0.05
+          ),
+          xaxis = list(
+            title = "Year",
+            gridcolor = "#E5E5E5",
+            range = c(1970, year_control()),
+            showline = TRUE,
+            linewidth = 2,
+            linecolor = "black",
+            mirror = FALSE # Only bottom line
+          ),
+          yaxis = list(
+            title = metric_label,
+            gridcolor = "#E5E5E5",
+            rangemode = "tozero",
+            showline = TRUE,
+            linewidth = 2,
+            linecolor = "black",
+            mirror = FALSE # Only left line
+          ),
+          annotations = list(
+            list(
+              x = 0,
+              y = 1.08,
+              xref = "paper",
+              yref = "paper",
+              text = paste0("<i>", metric_explanation, "</i>"),
+              showarrow = FALSE,
+              font = list(size = 12, color = "gray")
+            )
+          ),
           hovermode = "closest",
           legend = list(orientation = "v", x = 1.02, y = 1, bgcolor = "rgba(255,255,255,0.8)"),
-          plot_bgcolor = "#F8F9FA", paper_bgcolor = "#FFFFFF"
+          plot_bgcolor = "#F8F9FA", paper_bgcolor = "#FFFFFF",
+          margin = list(t = 80) # Add margin for title/explanation
         )
     })
   })

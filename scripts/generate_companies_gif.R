@@ -40,16 +40,12 @@ commodity_colors <- c(
 
 # Create horizontal bar race chart
 p <- ggplot(df_top10) +
-  geom_col(aes(x = rank, y = value, fill = dominant_commodity, group = parent_entity),
-    width = 0.8, color = "white", size = 0.5
+  geom_col(aes(x = rank, y = value, group = parent_entity),
+    fill = "#457B9D", width = 0.8, color = "white", size = 0.5
   ) +
   geom_text(
     data = df_top10, aes(x = rank, y = 0, label = parent_entity, group = parent_entity),
     hjust = 1.1, size = 5.5, fontface = "bold", color = "black"
-  ) +
-  geom_text(
-    data = df_top10, aes(x = rank, y = value, label = value_label, group = parent_entity),
-    hjust = -0.1, size = 4.5, color = "black"
   ) +
   coord_flip(clip = "off") +
   scale_x_reverse(breaks = 1:10) +
@@ -57,11 +53,6 @@ p <- ggplot(df_top10) +
     labels = scales::comma,
     limits = c(0, NA),
     expand = expansion(mult = c(0, 0.15))
-  ) +
-  scale_fill_manual(
-    values = commodity_colors,
-    name = "Primary Commodity",
-    na.value = "gray70"
   ) +
   theme_minimal() +
   theme(
@@ -73,15 +64,13 @@ p <- ggplot(df_top10) +
     panel.grid.major.y = element_blank(),
     panel.grid.minor = element_blank(),
     panel.grid.major.x = element_line(color = "gray90"),
-    plot.margin = margin(1, 3, 1, 7, "cm"),
+    plot.margin = margin(1, 4, 1, 10, "cm"),
     plot.background = element_rect(fill = "white", color = NA),
     panel.background = element_rect(fill = "white", color = NA),
-    legend.position = "bottom",
-    legend.title = element_text(size = 12, face = "bold"),
-    legend.text = element_text(size = 10)
+    legend.position = "none"
   ) +
   labs(
-    title = "Top 10 Emitting Companies",
+    title = NULL,
     subtitle = "Year: {closest_state}",
     x = NULL,
     y = "Total Emissions (MtCO2e)"

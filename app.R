@@ -22,7 +22,7 @@ options(ghg_pal = list(
   lime   = "#A7CE47", # Power / Oceania
   tan    = "#E9BE86", # Transport / Africa
   grey   = "#B5B5B5", # Waste / World Total
-  navy   = "#1D3557"  # Titles / Text
+  navy   = "#1D3557" # Titles / Text
 ))
 
 # Load diagram modules
@@ -52,14 +52,14 @@ ui <- navbarPage(
     version = 5,
     bg = "#ffffff",
     fg = "#1D3557",
-    primary = "#6574B9",   # Changed to Slate Blue to match "Fuel/Europe/Companies"
+    primary = "#6574B9", # Changed to Slate Blue to match "Fuel/Europe/Companies"
     secondary = "#4DC3B3", # Changed to Teal to match "Agriculture/Americas"
-    success = "#A7CE47",   # Changed to Lime to match "Power/Oceania"
-    danger = "#F28E5C",    # Changed to Soft Orange (replaces harsh red)
+    success = "#A7CE47", # Changed to Lime to match "Power/Oceania"
+    danger = "#F28E5C", # Changed to Soft Orange (replaces harsh red)
     base_font = bslib::font_google("Inter"),
     heading_font = bslib::font_google("Inter")
   ),
-  
+
   # Global CSS to clean up UI
   header = tags$head(
     tags$style(HTML("
@@ -68,47 +68,52 @@ ui <- navbarPage(
       .container-fluid { padding-top: 20px; }
     "))
   ),
-  
   tabPanel(
     "Home",
     icon = icon("home"),
-    fluidPage(mod_page_home_ui("page_home"))
+    fluidPage(mod_page_home_ui("home"))
   ),
   tabPanel(
     "Global",
     icon = icon("globe-americas"),
-    fluidPage(mod_page_regions_ui("page_regions"))
+    fluidPage(mod_page_regions_ui("regions"))
   ),
   tabPanel(
     "Map",
     icon = icon("map-marked-alt"),
-    fluidPage(mod_page_heatmap_ui("page_heatmap"))
+    fluidPage(mod_page_heatmap_ui("heatmap"))
   ),
   tabPanel(
     "Sectors",
     icon = icon("industry"),
-    fluidPage(mod_page_sectors_ui("page_sectors"))
+    fluidPage(mod_page_sectors_ui("sectors"))
   ),
   tabPanel(
     "Companies",
     icon = icon("building"),
-    fluidPage(mod_page_companies_ui("page_companies"))
+    fluidPage(mod_page_companies_ui("companies"))
+  ),
+  tabPanel(
+    "Report",
+    icon = icon("file-download"),
+    fluidPage(mod_page_download_ui("download"))
   ),
   tabPanel(
     "About",
     icon = icon("info-circle"),
-    fluidPage(mod_page_about_ui("page_about"))
+    fluidPage(mod_page_about_ui("about"))
   )
 )
 
 server <- function(input, output, session) {
   # Call page modules
-  mod_page_home_server("page_home")
-  mod_page_regions_server("page_regions")
-  mod_page_heatmap_server("page_heatmap")
-  mod_page_sectors_server("page_sectors")
-  mod_page_companies_server("page_companies")
-  mod_page_about_server("page_about")
+  mod_page_home_server("home")
+  mod_page_regions_server("regions")
+  mod_page_heatmap_server("heatmap")
+  mod_page_sectors_server("sectors")
+  mod_page_companies_server("companies")
+  mod_page_download_server("download")
+  mod_page_about_server("about")
 }
 
 shinyApp(ui, server)
