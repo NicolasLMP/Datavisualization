@@ -6,6 +6,7 @@ library(dygraphs)
 library(xts)
 library(plotly)
 library(purrr)
+library(khroma)
 
 # Load data
 data <- read.csv("data/data_cleaned/GHG_by_sector_and_country.csv", stringsAsFactors = FALSE)
@@ -64,12 +65,40 @@ mod_emissions_by_sectors_abs_server <- function(id, sectors, countries) {
         )
       })
       
-      sector_colors <- c(
-        "Agriculture" = "#4DC3B3", "Buildings" = "#F28E5C", "Fuel Exploitation" = "#6574B9",
-        "Industrial Combustion" = "#D970C4", "Power Industry" = "#A7CE47", "Processes" = "#F1D54A",
-        "Transport" = "#E9BE86", "Waste" = "#B5B5B5"
+      # sector_colors <- c(
+      #   "Agriculture" = "#4DC3B3",
+      #   "Buildings" = "#F28E5C",
+      #   "Fuel Exploitation" = "#6574B9",
+      #   "Industrial Combustion" = "#D970C4",
+      #   "Power Industry" = "#A7CE47",
+      #   "Processes" = "#F1D54A",
+      #   "Transport" = "#E9BE86",
+      #   "Waste" = "#B5B5B5"
+      # )
+
+      
+      # sector_colors <- c(
+      #   "Agriculture"           = "#629E92", # Muted Sage Green
+      #   "Buildings"             = "#E2A03F", # Ochre/Gold
+      #   "Fuel Exploitation"     = "#5790AB", # Steel Blue
+      #   "Industrial Combustion" = "#A35C7A", # Dusty Rose/Mauve
+      #   "Power Industry"        = "#004E82", # Deep Navy
+      #   "Processes"             = "#C9BB6A", # Soft Straw
+      #   "Transport"             = "#B6512C", # Terracotta
+      #   "Waste"                 = "#7A7A7A"  # Cool Grey
+      # )
+      # 
+      # sector_colors <- sector_colors[names(sector_colors) %in% unique(df$Sector)]
+      
+      palette_okabe <- color("okabe ito")(8)
+      
+      # Map the categories to the palette dynamically
+      sector_names <- c(
+        "Waste", "Agriculture", "Buildings", "Fuel Exploitation", 
+        "Industrial Combustion", "Power Industry", "Processes", 
+        "Transport"
       )
-      sector_colors <- sector_colors[names(sector_colors) %in% unique(df$Sector)]
+      sector_colors <- setNames(as.character(palette_okabe[1:length(sector_names)]), sector_names)
       
       plot_ly(
         df, x = ~year, y = ~CO2e, color = ~Sector, colors = sector_colors,
@@ -148,8 +177,8 @@ mod_emissions_by_sectors_abs_server <- function(id, sectors, countries) {
         mutate(pct = value / sum(value))
       
       # 2. Grouping Logic: Only group if there is MORE than one small gas
-      small_gases <- df_gas %>% filter(pct < 0.06)
-      main_gases <- df_gas %>% filter(pct >= 0.06)
+      small_gases <- df_gas %>% filter(pct < 0.04)
+      main_gases <- df_gas %>% filter(pct >= 0.04)
       
       if(nrow(small_gases) > 1) {
         # Combine multiple small gases into "Others"
@@ -164,29 +193,66 @@ mod_emissions_by_sectors_abs_server <- function(id, sectors, countries) {
       }
       
       # 3. Dynamic color mapping
-      gas_colors_map <- c("CO2" = "#2A9D8F", "CH4" = "#E9C46A", "N2O" = "#F4A261", "F-gases" = "#C34A36")
+      # gas_colors_map <- c("CO2" = "#2A9D8F", "CH4" = "#E9C46A", "N2O" = "#F4A261", "F-gases" = "#C34A36")
       
+      # gas_colors_map <- c(
+      #   "CO2"     = "#2E5A88", # Deep Atmospheric Blue
+      #   "CH4"     = "#D99527", # Soft Amber
+      #   "N2O"     = "#4E8474", # Seafoam/Deep Teal
+      #   "F-gases" = "#956385", # Muted Orchid
+      #   "Others"  = "#B2B2B2"  # Silver Grey
+      # )
+      paul_tol_bright <- as.character(color("bright")(4))
+      
+      # Paul Tol's recommended neutral grey for qualitative schemes
+      paul_tol_grey <- "#BBBBBB"
+      
+      # Create the fixed mapping
+      gas_colors_fixed <- c(
+        "CO2"     = paul_tol_bright[1],
+        "CH4"     = paul_tol_bright[2],
+        "N2O"     = paul_tol_bright[3],
+        "F-gases" = paul_tol_bright[4],
+        "Others"  = paul_tol_grey
+      )
+      
+      # current_colors <- sapply(df_gas$gas, function(g) {
+      #   if (grepl("Others", g)) return("#D3D3D3") # Grey for combined Others
+      #   return(gas_colors_map[g])
+      # })
       current_colors <- sapply(df_gas$gas, function(g) {
-        if (grepl("Others", g)) return("#D3D3D3") # Grey for combined Others
-        return(gas_colors_map[g])
+        if (grepl("Others", g)) {
+          return(unname(gas_colors_fixed["Others"]))
+        } else {
+          # Return the specific color for CO2, CH4, etc.
+          return(unname(gas_colors_fixed[g]))
+        }
       })
       
       plot_ly(
-        df_gas, labels = ~gas, values = ~value, type = "pie", hole = 0.6,
-        textinfo = "label+percent", hoverinfo = "none",
+        df_gas, 
+        labels = ~gas, 
+        values = ~value, 
+        type = "pie", 
+        hole = 0.6,
+        # textinfo = "label+percent", 
+        textposition = "outside",
+        hoverinfo = "none",
+        texttemplate = "<b>%{label}</b><br>%{percent:.2%}",
         marker = list(colors = unname(current_colors)),
-        domain = list(x = c(0, 1), y = c(0, 1)) # Keeps donut centered
+        # domain = list(x = c(0, 1), y = c(0, 1)) # Keeps donut centered
+        domain = list(x = c(0.1, 0.9), y = c(0.1, 0.9))
       ) %>%
         layout(
           title = list(
             text = paste0("What is the gas composition of<br>", 
-                          paste(unique(df$Country), collapse = ", "), "'s ", 
+                          paste(unique(df$Country), collapse = ", "), "'s <br>", 
                           hovered_sector, " in ", hover_year, "?"),
-            font = list(size = 14),
+            #font = list(size = 14),
             # --- ALIGN TITLE TO TOP ---
             y = 1,
             yanchor = "top",
-            pad = list(t = 10) # Optional: slight padding from the very edge
+            pad = list(t = 12) # Optional: slight padding from the very edge
           ),
           showlegend = TRUE,
           legend = list(
