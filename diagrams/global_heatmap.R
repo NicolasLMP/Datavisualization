@@ -11,42 +11,42 @@ mod_global_heatmap_server <- function(id, map_year, map_metric) {
   moduleServer(id, function(input, output, session) {
     output$choroplethMap <- renderLeaflet({
       metric_col <- switch(map_metric(),
-        "total" = "total_emissions_MtCO2e",
-        "per_capita" = "emissions_per_capita",
-        "per_gdp" = "emissions_per_GDP"
+                           "total" = "total_emissions_MtCO2e",
+                           "per_capita" = "emissions_per_capita",
+                           "per_gdp" = "emissions_per_GDP"
       )
       metric_label <- switch(map_metric(),
-        "total" = "MtCO2e",
-        "per_capita" = "tCO2e/person",
-        "per_gdp" = "kgCO2e/$"
+                             "total" = "MtCO2e",
+                             "per_capita" = "tCO2e/person",
+                             "per_gdp" = "kgCO2e/$"
       )
-
+      
       # Get world geometry
       world <- ne_countries(scale = 110, returnclass = "sf")
-
+      
       # Prepare data
       country_emissions <- .edgar_hm |>
         dplyr::filter(year == map_year()) |>
         dplyr::mutate(
           iso_match = country_code,
           iso_match = ifelse(is.na(iso_match) | iso_match == "" | nchar(iso_match) != 3,
-            countrycode::countrycode(country_clean, origin = "country.name", destination = "iso3c"),
-            iso_match
+                             countrycode::countrycode(country_clean, origin = "country.name", destination = "iso3c"),
+                             iso_match
           ),
           iso_match = toupper(trimws(iso_match))
         ) |>
         dplyr::select(iso_match, country_clean, metric_value = dplyr::all_of(metric_col))
-
+      
       # Aggregation
       emissions_by_iso <- country_emissions |>
         dplyr::filter(!is.na(iso_match)) |>
         dplyr::group_by(iso_match) |>
         dplyr::summarise(value_iso = sum(metric_value, na.rm = TRUE), .groups = "drop")
-
+      
       emissions_by_name <- country_emissions |>
         dplyr::group_by(country_clean) |>
         dplyr::summarise(value_name = sum(metric_value, na.rm = TRUE), .groups = "drop")
-
+      
       # Join with world data
       world_data <- world |>
         dplyr::left_join(emissions_by_iso, by = c("iso_a3" = "iso_match")) |>
@@ -54,29 +54,30 @@ mod_global_heatmap_server <- function(id, map_year, map_metric) {
         dplyr::mutate(
           value = dplyr::coalesce(value_iso, value_name),
           value_display = ifelse(is.na(value), "No data",
-            paste0(format(round(value, 2), big.mark = ","), " ", metric_label)
+                                 paste0(format(round(value, 2), big.mark = ","), " ", metric_label)
           ),
           tooltip = sprintf("<strong>%s</strong><br/>Year: %s<br/>%s", name, map_year(), value_display)
         ) |>
         dplyr::select(-value_iso, -value_name)
-
+      
       # Color palette
       # A "Value-Linked" Heat Scale
       # Light/Bright (Low Value) -> Dark/Saturated (High Value)
       pal <- colorNumeric(
         palette = c(
-          "#FFF7BC", # Very low (Lightest Value)
-          "#FEE391", 
-          "#FEC44F", # Mid-low
-          "#FB9A29", # Mid (Matches your 'Orange' sector anchor)
-          "#EC7014", 
-          "#CC4C02", # High
-          "#802405"  # Very high (Darkest Value - heavy GHG)
+          "#ffffcc", # Level 1 (Lightest - Very Low)
+          "#ffeda0", # Level 2
+          "#fed976", # Level 3
+          "#feb24c", # Level 4 (Mid-point)
+          "#fd8d3c", # Level 5
+          "#fc4e2a", # Level 6
+          "#e31a1c", # Level 7 (High)
+          "#b10026"  # Level 8 (Darkest - Very High)
         ),
         domain = world_data$value, 
         na.color = "#F2F2F2" # Very light grey so it disappears into the map
       )
-
+      
       # Create map
       map <- leaflet(world_data, options = leafletOptions(
         worldCopyJump = FALSE,
@@ -102,7 +103,7 @@ mod_global_heatmap_server <- function(id, map_year, map_metric) {
             textsize = "13px", direction = "auto"
           )
         )
-
+      
       # Add Legend
       map <- leaflet::addLegend(
         map,
@@ -111,7 +112,7 @@ mod_global_heatmap_server <- function(id, map_year, map_metric) {
         position = "bottomright", opacity = 0.7,
         labFormat = labelFormat(big.mark = ",")
       )
-
+      
       map
     })
   })

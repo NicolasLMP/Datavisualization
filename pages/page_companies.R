@@ -1,36 +1,33 @@
 mod_page_companies_ui <- function(id) {
     ns <- NS(id)
     tagList(
-        titlePanel("Most emitting companies"),
+        titlePanel("How much do top companies emit?"),
         sidebarLayout(
             sidebarPanel(
                 width = 3,
                 h4("Information"),
-                helpText("This page visualizes the top emitting companies."),
-                hr(),
-                helpText("The animation on the right shows the evolution of the top 10 emitters over time (1970-2022)."),
-                hr(),
-                helpText("Note: The 'Vs World' comparison below uses data from the latest available year (2022).")
+                helpText("This page visualizes the global 174 top emitting companies over time.")
             ),
             mainPanel(
                 width = 9,
-                h4("Top Companies vs World Emissions"),
+                #h4("Top Companies vs World Emissions"),
                 mod_company_vs_world_ui(ns("companies_vs_world")),
                 mod_top_companies_ui(ns("companies_plot")),
                 hr(),
                 wellPanel(
-                    style = "background-color: #f8f9fa;",
-                    h4("Research questions", style = "color: #2c3e50;"),
-                    tags$ul(
-                        tags$li("How do the world emissions develop over time?"),
-                        tags$li("How do the summed up emissions of the top emitting companies develop over time?"),
-                        tags$li("How do the summed up emissions of the top emitting companies develop over time in relation to the worlds emission?"),
-                        tags$li("How do the top 10 emitters compare to the total?"),
-                        tags$li("What percentage of total emissions do the top 10 represent?"),
-                        tags$li("How have the rankings changed over time?"),
-                        tags$li("What is the concentration of emissions among major polluters?")
-                    )
-                )
+                  style = "background-color: #fcfcfc; border-left: 5px solid #0072B2;",
+                  h4("Research Questions", style = "color: #0072B2; font-weight: bold;"),
+                  tags$ul(
+                    tags$li("How do global emissions develop over time?"),
+                    tags$li("How do the total emissions of top-emitting companies trend over time?"),
+                    tags$li("What is the relationship between corporate emissions and world total emissions?"),
+                    tags$li("How do the top 10 emitters compare to the global total?"),
+                    tags$li("What percentage of total emissions do the top 10 companies represent?"),
+                    tags$li("How have company rankings changed over the years?"),
+                    tags$li("What is the concentration of emissions among the world's major polluters?")
+                  )
+                ),
+                tags$div(style = "height: 30px;")
             )
         )
     )

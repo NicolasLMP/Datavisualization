@@ -177,8 +177,8 @@ mod_emissions_by_sectors_abs_server <- function(id, sectors, countries) {
         mutate(pct = value / sum(value))
       
       # 2. Grouping Logic: Only group if there is MORE than one small gas
-      small_gases <- df_gas %>% filter(pct < 0.04)
-      main_gases <- df_gas %>% filter(pct >= 0.04)
+      small_gases <- df_gas %>% filter(pct < 0.05)
+      main_gases <- df_gas %>% filter(pct >= 0.05)
       
       if(nrow(small_gases) > 1) {
         # Combine multiple small gases into "Others"
@@ -241,7 +241,7 @@ mod_emissions_by_sectors_abs_server <- function(id, sectors, countries) {
         texttemplate = "<b>%{label}</b><br>%{percent:.2%}",
         marker = list(colors = unname(current_colors)),
         # domain = list(x = c(0, 1), y = c(0, 1)) # Keeps donut centered
-        domain = list(x = c(0.1, 0.9), y = c(0.1, 0.9))
+        domain = list(x = c(0.2, 0.8), y = c(0.2, 0.8))
       ) %>%
         layout(
           title = list(

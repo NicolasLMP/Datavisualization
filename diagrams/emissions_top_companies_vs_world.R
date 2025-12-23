@@ -70,8 +70,8 @@ mod_company_vs_world_server <- function(id, race_year) {
       
       # Define colors
       cat_colors <- c(
-        "Top Emitting Companies" = "#6574B9", 
-        "World Total"            = "#B5B5B5"
+        "Top Emitting Companies" = "#0072B2", # Okabe-Ito Blue (Matches your buttons/UI)
+        "World Total"            = "#BBBBBB"  # Paul Tol Grey (Neutral and professional)
       )
       
       plot_ly(
@@ -81,7 +81,7 @@ mod_company_vs_world_server <- function(id, race_year) {
       ) %>%
         config(modeBarButtonsToRemove = c("select2d", "lasso2d")) %>%
         layout(
-          title = "GHG Emission Trends: Companies vs. World",
+          title = "How do the emissions of the top emitting companies compare to the global emissions?",
           xaxis = list(title = "Year", fixedrange = TRUE),
           yaxis = list(title = "Emissions (Mt CO₂e)", rangemode = "tozero", fixedrange = TRUE),
           # shapes = list(
