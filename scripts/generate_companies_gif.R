@@ -40,13 +40,14 @@ commodity_colors <- c(
 
 # Create horizontal bar race chart
 p <- ggplot(df_top10) +
-  geom_col(aes(x = rank, y = value, group = parent_entity),
-    fill = "#457B9D", width = 0.8, color = "white", size = 0.5
+  geom_col(aes(x = rank, y = value, group = parent_entity, fill = dominant_commodity),
+    width = 0.8, color = "white", size = 0.5
   ) +
   geom_text(
     data = df_top10, aes(x = rank, y = 0, label = parent_entity, group = parent_entity),
     hjust = 1.1, size = 5.5, fontface = "bold", color = "black"
   ) +
+  scale_fill_manual(values = commodity_colors) +
   coord_flip(clip = "off") +
   scale_x_reverse(breaks = 1:10) +
   scale_y_continuous(
@@ -64,10 +65,11 @@ p <- ggplot(df_top10) +
     panel.grid.major.y = element_blank(),
     panel.grid.minor = element_blank(),
     panel.grid.major.x = element_line(color = "gray90"),
-    plot.margin = margin(1, 4, 1, 10, "cm"),
+    plot.margin = margin(1, 4, 1, 12, "cm"),
     plot.background = element_rect(fill = "white", color = NA),
     panel.background = element_rect(fill = "white", color = NA),
-    legend.position = "none"
+    legend.position = "bottom",
+    legend.title = element_blank()
   ) +
   labs(
     title = NULL,
@@ -80,5 +82,5 @@ p <- ggplot(df_top10) +
 
 # Save
 if (!dir.exists("www")) dir.create("www")
-anim_save("www/companies_race.gif", p, fps = 20, duration = 60, width = 1200, height = 700, end_pause = 40)
-print("GIF generated successfully at www/companies_race.gif")
+anim_save("www/companies_race_v3.gif", p, fps = 20, duration = 60, width = 1200, height = 700, end_pause = 40)
+print("GIF generated successfully at www/companies_race_v3.gif")

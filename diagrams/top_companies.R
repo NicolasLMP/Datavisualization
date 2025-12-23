@@ -5,9 +5,9 @@ mod_top_companies_ui <- function(id) {
   tagList(
     tags$div(
       style = "text-align: center; margin-bottom: 20px;",
-      tags$h3("Top 10 Emitting Companies (Evolution)"),
+      tags$h3("Who are the top 10 emitting companies?", style = "color: #2c3e50; font-weight: bold;"),
       tags$img(
-        src = "companies_race.gif", style = "max-width: 100%; height: auto;",
+        src = "companies_race_v3.gif", style = "max-width: 100%; height: auto;",
         alt = "Animation not generated. Please run scripts/generate_companies_gif.R"
       )
     )
