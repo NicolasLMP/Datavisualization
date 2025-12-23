@@ -35,7 +35,11 @@ commodity_colors <- c(
   "Coal" = "#1D3557",
   "Cement" = "#A8DADC",
   "Metallurgical Coal" = "#2A9D8F",
-  "Thermal Coal" = "#264653"
+  "Thermal Coal" = "#264653",
+  "Bituminous Coal" = "#2B2D42",
+  "Sub-Bituminous Coal" = "#8D99AE",
+  "Lignite" = "#D90429",
+  "Anthracite" = "#000000"
 )
 
 # Create horizontal bar race chart
@@ -82,5 +86,5 @@ p <- ggplot(df_top10) +
 
 # Save
 if (!dir.exists("www")) dir.create("www")
-anim_save("www/companies_race_v3.gif", p, fps = 20, duration = 60, width = 1200, height = 700, end_pause = 40)
-print("GIF generated successfully at www/companies_race_v3.gif")
+anim_save("www/companies_race_v4.gif", p, fps = 20, duration = 60, width = 1200, height = 700, end_pause = 40)
+print("GIF generated successfully at www/companies_race_v4.gif")
