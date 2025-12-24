@@ -9,31 +9,26 @@ library(tidyr)
 mod_ai_analysis_ui <- function(id) {
     ns <- NS(id)
     tagList(
-        tags$div(
-            style = "margin-bottom: 20px;",
-            tags$h3("Sector Fingerprint: Comparing Emission Profiles (2022)",
-                style = "font-family: 'Inter', sans-serif; font-weight: bold; color: #2c3e50; text-align: center; margin-bottom: 20px;"
-            )
-        ),
         plotlyOutput(ns("radarChart"), height = "650px")
     )
 }
 
-mod_ai_analysis_server <- function(id) {
+mod_ai_analysis_server <- function(id, selected_year, selected_countries) {
     moduleServer(id, function(input, output, session) {
         output$radarChart <- renderPlotly({
-            # 1. Filter Data for 2022 and clean sectors
-            df_2022 <- .ai_data %>%
+            req(selected_year())
+            req(selected_countries())
+
+            # 1. Filter Data dynamically
+            df_filtered <- .ai_data %>%
                 filter(
-                    year == 2022,
+                    year == selected_year(),
                     Sector != "Total including LUCF" & Sector != "Total excluding LUCF"
                 )
 
             # 2. Calculate Sector Shares (%) for Specific Emitters
-            target_entities <- c("China", "United States", "EU27", "GLOBAL TOTAL")
-
-            df_radar <- df_2022 %>%
-                filter(Country %in% target_entities) %>%
+            df_radar <- df_filtered %>%
+                filter(Country %in% selected_countries()) %>%
                 group_by(Country) %>%
                 mutate(
                     Total_Country = sum(CO2e, na.rm = TRUE),
@@ -42,38 +37,42 @@ mod_ai_analysis_server <- function(id) {
                 ungroup() %>%
                 select(Country, Sector, Share)
 
+            # Validate we have data
+            validate(
+                need(nrow(df_radar) > 0, "No data available for the selected combination.")
+            )
+
             # 3. Reshape for Plotly
-            # Ensure all sectors are present for all countries (fill 0 if missing)
-            all_sectors <- unique(df_radar$Sector)
+            all_sectors <- unique(df_filtered$Sector)
             df_radar_complete <- df_radar %>%
                 complete(Country, Sector = all_sectors, fill = list(Share = 0))
 
             # 4. Plot - Radar Chart works best by adding traces one by one
             fig <- plot_ly(type = "scatterpolar", fill = "toself")
 
-            # Define colors/styles for targets
-            styles <- list(
-                "China" = list(color = "#E9BE86", dash = "solid"), # Orange
-                "United States" = list(color = "#6574B9", dash = "solid"), # Blue
-                "EU27" = list(color = "#4DC3B3", dash = "solid"), # Teal
-                "GLOBAL TOTAL" = list(color = "#2c3e50", dash = "dot") # Dark Grey Dotted
-            )
+            # Color palette for dynamic selection (extended palette)
+            palette <- c("#E9BE86", "#6574B9", "#4DC3B3", "#D970C4", "#A7CE47", "#F1D54A", "#F28E5C", "#B5B5B5", "#2c3e50", "#e74c3c")
 
-            for (entity in target_entities) {
+            for (i in seq_along(selected_countries())) {
+                entity <- selected_countries()[i]
                 entity_data <- df_radar_complete %>% filter(Country == entity)
 
                 # Radar charts need to close the loop (repeat first point)
                 r_vals <- c(entity_data$Share, entity_data$Share[1])
                 theta_vals <- c(entity_data$Sector, entity_data$Sector[1])
 
-                style <- styles[[entity]]
+                # Cycle through colors
+                col <- palette[(i - 1) %% length(palette) + 1]
+
+                # Special style for GLOBAL TOTAL if present
+                dash_style <- if (entity == "GLOBAL TOTAL") "dot" else "solid"
 
                 fig <- fig %>% add_trace(
                     r = r_vals,
                     theta = theta_vals,
                     name = ifelse(entity == "GLOBAL TOTAL", "Global Average", entity),
-                    line = list(color = style$color, dash = style$dash),
-                    marker = list(color = style$color)
+                    line = list(color = col, dash = dash_style),
+                    marker = list(color = col)
                 )
             }
 
@@ -82,12 +81,20 @@ mod_ai_analysis_server <- function(id) {
                     polar = list(
                         radialaxis = list(
                             visible = TRUE,
-                            range = c(0, max(df_radar_complete$Share) + 5),
+                            range = c(0, max(df_radar_complete$Share, na.rm = TRUE) + 5),
                             ticksuffix = "%"
                         )
                     ),
+                    # Dynamic Title based on selection
+                    title = list(
+                        text = paste0("<b>Sector Fingerprint (", selected_year(), ")</b>"),
+                        y = 1.2,
+                        x = 0.5,
+                        xanchor = "center",
+                        yanchor = "top"
+                    ),
                     legend = list(title = list(text = "Economy Profile")),
-                    margin = list(t = 20, l = 50, r = 50, b = 20)
+                    margin = list(t = 80, l = 50, r = 50, b = 20)
                 )
         })
     })
