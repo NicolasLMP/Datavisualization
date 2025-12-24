@@ -33,6 +33,7 @@ source("diagrams/emissions_by_sector_abs.R")
 source("diagrams/emissions_by_sector_rel.R")
 source("diagrams/emissions_by_sector_rel_stacked.R")
 source("diagrams/emissions_top_companies_vs_world.R")
+source("diagrams/ai_analysis.R")
 
 # Load page modules
 source("pages/page_home.R")
@@ -42,6 +43,7 @@ source("pages/page_sectors.R")
 source("pages/page_companies.R")
 source("pages/page_about.R")
 source("pages/page_download.R")
+source("pages/page_ai_analysis.R")
 
 ui <- navbarPage(
   title = tags$span(
@@ -66,13 +68,13 @@ ui <- navbarPage(
     tags$style(HTML("
       /* 1. Navbar bottom border */
       .navbar { border-bottom: 1px solid #EBEBEB !important; }
-      
+
       /* 2. Style for ALL nav links */
-      .nav-link { 
-        font-weight: 500 !important; 
+      .nav-link {
+        font-weight: 500 !important;
         color: #1D3557 !important; /* Default dark navy text */
       }
-      
+
       /* 3. Style for the SELECTED (Active) tab */
       .navbar-nav .nav-link.active {
         color: #0072B2 !important; /* Your Theme Blue */
@@ -115,6 +117,11 @@ ui <- navbarPage(
     fluidPage(mod_page_companies_ui("companies"))
   ),
   tabPanel(
+    "AI Graph",
+    icon = icon("robot"),
+    fluidPage(mod_page_ai_analysis_ui("ai_analysis"))
+  ),
+  tabPanel(
     "Report",
     icon = icon("file-download"),
     fluidPage(mod_page_download_ui("download"))
@@ -144,6 +151,7 @@ server <- function(input, output, session) {
   mod_page_heatmap_server("heatmap")
   mod_page_sectors_server("sectors")
   mod_page_companies_server("companies")
+  mod_page_ai_analysis_server("ai_analysis")
   mod_page_download_server("download")
   mod_page_about_server("about")
 }

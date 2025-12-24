@@ -13,9 +13,9 @@ mod_page_heatmap_ui <- function(id) {
               border-top: 1px solid #0072B2 !important;
               border-bottom: 1px solid #0072B2 !important;
             }
-            
+
             /* 2. THE HANDLE - Only Border Blue */
-            .irs-handle { 
+            .irs-handle {
               border: 2px solid #0072B2 !important;
               background-color: white !important;
               box-shadow: none !important;
@@ -25,30 +25,28 @@ mod_page_heatmap_ui <- function(id) {
             .irs-single:after {
               border-top-color: #0072B2 !important;
             }
-            
+
             /* 4. Radio Button Selection Color */
             input[type='radio']:checked {
               accent-color: #0072B2;
             }
-            
+
             .sidebar-header { font-weight: bold; margin-bottom: 10px; }
           ")))
         ),
-        
         sliderInput(ns("map_year"), "Select year:",
-                    min = 1970, max = 2023, value = 2023,
-                    step = 1, sep = ""
+          min = 1970, max = 2023, value = 2023,
+          step = 1, sep = ""
         ),
-        
         radioButtons(ns("map_metric"), "Select metric:",
-                     choices = c(
-                       "Total Emissions" = "total",
-                       "Per Capita" = "per_capita",
-                       "Per GDP" = "per_gdp"
-                     ),
-                     selected = "total"
+          choices = c(
+            "Total Emissions" = "total",
+            "Per Capita" = "per_capita",
+            "Per GDP" = "per_gdp",
+            "Total Accumulated" = "accumulated"
+          ),
+          selected = "total"
         ),
-        
         conditionalPanel(
           condition = sprintf("input['%s'] == 'per_gdp'", ns("map_metric")),
           tags$p(
@@ -61,7 +59,7 @@ mod_page_heatmap_ui <- function(id) {
         width = 9,
         mod_global_heatmap_ui(ns("heatmap_plot")),
         # Spacer instead of hr()
-        tags$div(style = "height: 30px;"), 
+        tags$div(style = "height: 30px;"),
         wellPanel(
           style = "background-color: #fcfcfc; border-left: 5px solid #0072B2;",
           h4("Research questions", style = "font-weight: bold;"),
@@ -78,22 +76,22 @@ mod_page_heatmap_ui <- function(id) {
 }
 
 mod_page_heatmap_server <- function(id) {
-    moduleServer(id, function(input, output, session) {
-        # Call the heatmap plot module
-        mod_global_heatmap_server("heatmap_plot",
-            map_year = reactive(input$map_year),
-            map_metric = reactive(input$map_metric)
-        )
+  moduleServer(id, function(input, output, session) {
+    # Call the heatmap plot module
+    mod_global_heatmap_server("heatmap_plot",
+      map_year = reactive(input$map_year),
+      map_metric = reactive(input$map_metric)
+    )
 
-        # Update year slider based on metric
-        observeEvent(input$map_metric, {
-            if (input$map_metric %in% c("per_capita", "per_gdp")) {
-                updateSliderInput(session, "map_year", min = 1990, value = max(1990, input$map_year))
-            } else {
-                updateSliderInput(session, "map_year", min = 1970)
-            }
-        })
+    # Update year slider based on metric
+    observeEvent(input$map_metric, {
+      if (input$map_metric %in% c("per_capita", "per_gdp")) {
+        updateSliderInput(session, "map_year", min = 1990, value = max(1990, input$map_year))
+      } else {
+        updateSliderInput(session, "map_year", min = 1970)
+      }
     })
+  })
 }
 # mod_page_heatmap_ui <- function(id) {
 #     ns <- NS(id)
@@ -147,7 +145,7 @@ mod_page_heatmap_server <- function(id) {
 #         )
 #     )
 # }
-# 
+#
 # mod_page_heatmap_server <- function(id) {
 #     moduleServer(id, function(input, output, session) {
 #         # Call the heatmap plot module
@@ -155,7 +153,7 @@ mod_page_heatmap_server <- function(id) {
 #             map_year = reactive(input$map_year),
 #             map_metric = reactive(input$map_metric)
 #         )
-# 
+#
 #         # Update year slider based on metric
 #         observeEvent(input$map_metric, {
 #             if (input$map_metric %in% c("per_capita", "per_gdp")) {
