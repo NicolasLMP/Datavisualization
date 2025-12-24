@@ -41,6 +41,7 @@ source("pages/page_heatmap.R")
 source("pages/page_sectors.R")
 source("pages/page_companies.R")
 source("pages/page_about.R")
+source("pages/page_download.R")
 
 ui <- navbarPage(
   title = tags$span(

@@ -16,7 +16,7 @@ mod_page_companies_ui <- function(id) {
                 hr(),
                 wellPanel(
                   style = "background-color: #fcfcfc; border-left: 5px solid #0072B2;",
-                  h4("Research Questions", style = "color: #0072B2; font-weight: bold;"),
+                  h4("Research questions", style = "font-weight: bold;"),
                   tags$ul(
                     tags$li("How do global emissions develop over time?"),
                     tags$li("How do the total emissions of top-emitting companies trend over time?"),
