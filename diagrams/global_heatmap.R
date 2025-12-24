@@ -12,47 +12,26 @@ mod_global_heatmap_ui <- function(id) {
 
 mod_global_heatmap_server <- function(id, map_year, map_metric) {
   moduleServer(id, function(input, output, session) {
-<<<<<<< HEAD
-    output$choroplethMap <- renderLeaflet({
-      metric_col <- switch(map_metric(),
-                           "total" = "total_emissions_MtCO2e",
-                           "per_capita" = "emissions_per_capita",
-                           "per_gdp" = "emissions_per_GDP"
-=======
     output$map_explanation <- renderUI({
       text <- switch(map_metric(),
         "total" = "Total greenhouse gas emissions in Million tonnes of CO2 equivalent (MtCO2e).",
         "per_capita" = "Average emissions per person (tCO2e/capita).",
         "per_gdp" = "Emissions intensity relative to economic output (tCO2e/million $ GDP).",
         "accumulated" = "Cumulative sum of annual emissions from start of dataset up to selected year."
->>>>>>> countries-companies
       )
       tags$p(text, style = "font-size: 0.9em; color: #7f8c8d; font-style: italic; margin-bottom: 15px;")
     })
 
     output$choroplethMap <- renderLeaflet({
       metric_label <- switch(map_metric(),
-<<<<<<< HEAD
-                             "total" = "MtCO2e",
-                             "per_capita" = "tCO2e/person",
-                             "per_gdp" = "kgCO2e/$"
-=======
         "total" = "MtCO2e",
         "per_capita" = "tCO2e/capita",
         "per_gdp" = "kgCO2e/$",
         "accumulated" = "MtCO2e (Cumulative)"
->>>>>>> countries-companies
       )
       
       # Get world geometry
       world <- ne_countries(scale = 110, returnclass = "sf")
-<<<<<<< HEAD
-      
-      # Prepare data
-      country_emissions <- .edgar_hm |>
-        dplyr::filter(year == map_year()) |>
-=======
-
       # Prepare data based on metric
       if (map_metric() == "accumulated") {
         country_emissions <- .edgar_hm |>
@@ -72,7 +51,6 @@ mod_global_heatmap_server <- function(id, map_year, map_metric) {
 
       # Add ISO matching
       country_emissions <- country_emissions |>
->>>>>>> countries-companies
         dplyr::mutate(
           iso_match = country_code,
           iso_match = ifelse(is.na(iso_match) | iso_match == "" | nchar(iso_match) != 3,
@@ -81,13 +59,9 @@ mod_global_heatmap_server <- function(id, map_year, map_metric) {
           ),
           iso_match = toupper(trimws(iso_match))
         ) |>
-<<<<<<< HEAD
-        dplyr::select(iso_match, country_clean, metric_value = dplyr::all_of(metric_col))
-      
-=======
+
         dplyr::select(iso_match, country_clean, metric_value)
 
->>>>>>> countries-companies
       # Aggregation
       emissions_by_iso <- country_emissions |>
         dplyr::filter(!is.na(iso_match)) |>
@@ -116,7 +90,6 @@ mod_global_heatmap_server <- function(id, map_year, map_metric) {
       # Light/Bright (Low Value) -> Dark/Saturated (High Value)
       pal <- colorNumeric(
         palette = c(
-<<<<<<< HEAD
           "#ffffcc", # Level 1 (Lightest - Very Low)
           "#ffeda0", # Level 2
           "#fed976", # Level 3
@@ -125,15 +98,6 @@ mod_global_heatmap_server <- function(id, map_year, map_metric) {
           "#fc4e2a", # Level 6
           "#e31a1c", # Level 7 (High)
           "#b10026"  # Level 8 (Darkest - Very High)
-=======
-          "#FFF7BC", # Very low (Lightest Value)
-          "#FEE391",
-          "#FEC44F", # Mid-low
-          "#FB9A29", # Mid (Matches your 'Orange' sector anchor)
-          "#EC7014",
-          "#CC4C02", # High
-          "#802405" # Very high (Darkest Value - heavy GHG)
->>>>>>> countries-companies
         ),
         domain = world_data$value,
         na.color = "#F2F2F2" # Very light grey so it disappears into the map
