@@ -41,10 +41,11 @@ source("pages/page_heatmap.R")
 source("pages/page_sectors.R")
 source("pages/page_companies.R")
 source("pages/page_about.R")
+source("pages/page_download.R")
 
 ui <- navbarPage(
   title = tags$span(
-    icon("leaf", style = "color: #2A9D8F;"), # Colored icon for a bit of pop
+    icon("leaf"),
     "GHG Emissions Dashboard"
   ),
   # Harmonized bslib theme
@@ -63,8 +64,28 @@ ui <- navbarPage(
   # Global CSS to clean up UI
   header = tags$head(
     tags$style(HTML("
+      /* 1. Navbar bottom border */
       .navbar { border-bottom: 1px solid #EBEBEB !important; }
-      .nav-link { font-weight: 500 !important; }
+      
+      /* 2. Style for ALL nav links */
+      .nav-link { 
+        font-weight: 500 !important; 
+        color: #1D3557 !important; /* Default dark navy text */
+      }
+      
+      /* 3. Style for the SELECTED (Active) tab */
+      .navbar-nav .nav-link.active {
+        color: #0072B2 !important; /* Your Theme Blue */
+        border-bottom: 3px solid #0072B2 !important; /* Bottom underline */
+        background-color: transparent !important;
+      }
+
+      /* 4. Hover effect */
+      .nav-link:hover {
+        color: #0072B2 !important;
+        opacity: 0.8;
+      }
+
       .container-fluid { padding-top: 20px; }
     "))
   ),
@@ -101,7 +122,18 @@ ui <- navbarPage(
   tabPanel(
     "About",
     icon = icon("info-circle"),
-    fluidPage(mod_page_about_ui("about"))
+    fluidPage(mod_page_about_ui("page_about"))
+  ),
+  # Footer
+  tags$div(
+    tags$p(
+      style = "margin-top: 60px; padding: 30px; background-color: #f8f9fa;
+                     text-align: center;",
+      "Data sources: ",
+      tags$a("EDGAR", href = "https://edgar.jrc.ec.europa.eu/report_2024", target = "_blank", style = "color: #457B9D; text-decoration: underline;"),
+      "and ",
+      tags$a("Carbon Majors Database", href = "https://carbonmajors.org/Downloads", target = "_blank", style = "color: #457B9D; text-decoration: underline;")
+    )
   )
 )
 

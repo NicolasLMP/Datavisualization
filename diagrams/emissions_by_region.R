@@ -3,6 +3,8 @@ library(plotly)
 library(dplyr)
 library(tidyr)
 library(countrycode)
+library(khroma)
+
 
 # Chargement et préparation des données (peut être mutualisé)
 # Updated path to cleaned data
@@ -76,12 +78,17 @@ mod_emissions_by_region_server <- function(id, continents, countries, metric, ye
         country_filtered <- .country_data |> dplyr::filter(country %in% countries(), year <= year_control())
       }
 
+      
+      # Generate 5 colors from the 'bright' scheme
+      pt_bright_5 <- as.character(color("bright")(5))
+      
+      # Create the fixed mapping for continents
       continent_colors <- c(
-        "Africa"   = "#E9BE86", # Tan
-        "Asia"     = "#F28E5C", # Soft Orange
-        "Europe"   = "#6574B9", # Slate Blue
-        "Americas" = "#4DC3B3", # Teal
-        "Oceania"  = "#A7CE47" # Lime
+        "Europe"   = pt_bright_5[1], # Blue
+        "Asia"     = pt_bright_5[2], # Red
+        "Americas"   = pt_bright_5[3], # Green
+        "Africa" = pt_bright_5[4], # Yellow
+        "Oceania"  = pt_bright_5[5]  # Cyan
       )
       plot <- plot_ly()
 
