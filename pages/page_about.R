@@ -63,8 +63,8 @@ mod_page_about_ui <- function(id) {
                 column(
                     4,
                     wellPanel(
-                        style = "background-color: #ecf0f1; min-height: 200px;",
-                        h4("Global page", style = "color: #16a085;"),
+                        style = "background-color: #ecf0f1; min-height: 280px;",
+                        h4("Global page", style = "color: #16a085; font-weight: bold;"),
                         tags$ul(
                             tags$li("Multi-metric analysis (total, per capita, per GDP, accumulated)"),
                             tags$li("Continental and country-level filtering"),
@@ -76,10 +76,10 @@ mod_page_about_ui <- function(id) {
                 column(
                     4,
                     wellPanel(
-                        style = "background-color: #ecf0f1; min-height: 200px;",
-                        h4("Map page", style = "color: #2980b9;"),
+                        style = "background-color: #ecf0f1; min-height: 280px;",
+                        h4("Map page", style = "color: #2980b9; font-weight: bold;"),
                         tags$ul(
-                            tags$li("Geographic visualization of emission intensities"),
+                            tags$li("Metrics: Total, Per Capita, Per GDP, and Total Accumulated"),
                             tags$li("Blue ocean basemap for context"),
                             tags$li("Light gray for missing data"),
                             tags$li("Interactive country tooltips")
@@ -89,13 +89,53 @@ mod_page_about_ui <- function(id) {
                 column(
                     4,
                     wellPanel(
-                        style = "background-color: #ecf0f1; min-height: 200px;",
-                        h4("Companies page", style = "color: #c0392b;"),
+                        style = "background-color: #ecf0f1; min-height: 280px;",
+                        h4("Companies page", style = "color: #c0392b; font-weight: bold;"),
                         tags$ul(
                             tags$li("Top 10 emitting companies ranking"),
                             tags$li("Commodity-based color coding"),
                             tags$li("Aggregate comparison (Top 10 vs All Companies)"),
                             tags$li("Historical ranking evolution (1854-2022)")
+                        )
+                    )
+                )
+            ),
+            fluidRow(
+                column(
+                    4,
+                    wellPanel(
+                        style = "background-color: #ecf0f1; min-height: 280px;",
+                        h4("AI Analysis", style = "color: #8e44ad; font-weight: bold;"),
+                        tags$ul(
+                            tags$li("Sector Fingerprint: Radar chart analysis of economic structures"),
+                            tags$li("Interactive comparison of multiple countries/continents"),
+                            tags$li("Analysis of emission drivers (Power vs Transport vs Industry)"),
+                            tags$li("Temporal evolution of economic 'shapes' (1990-2022)")
+                        )
+                    )
+                ),
+                column(
+                    4,
+                    wellPanel(
+                        style = "background-color: #ecf0f1; min-height: 280px;",
+                        h4("Sectors page", style = "color: #d35400; font-weight: bold;"),
+                        tags$ul(
+                            tags$li("Deep dive into emission sources (Energy, Agriculture, Waste, etc.)"),
+                            tags$li("Toggle between Absolute (MtCO₂e) and Relative (%) views"),
+                            tags$li("Stacked area charts for historical composition"),
+                            tags$li("Interactive breakouts of sub-sectors")
+                        )
+                    )
+                ),
+                column(
+                    4,
+                    wellPanel(
+                        style = "background-color: #ecf0f1; min-height: 280px;",
+                        h4("Data & Reports", style = "color: #7f8c8d; font-weight: bold;"),
+                        tags$ul(
+                            tags$li("Generate and download PDF reports of current logical state"),
+                            tags$li("Access raw data and key insights offline"),
+                            tags$li("Transparent data sourcing and citation")
                         )
                     )
                 )
