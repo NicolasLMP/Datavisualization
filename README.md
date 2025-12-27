@@ -1,208 +1,117 @@
-# 🌍 Global Greenhouse Gas Emissions Dashboard
+# Global Greenhouse Gas Emissions Dashboard
 
-A comprehensive interactive dashboard for exploring and analyzing global greenhouse gas emissions data from 1900 to 2022. Built with R Shiny, this application provides insights into emissions trends across countries, regions, sectors, and companies.
+A comprehensive interactive dashboard for exploring and analyzing global greenhouse gas emissions data from 1854 to 2023. Built with **R Shiny**, this application moves beyond simple country rankings to provide a multi-dimensional view of the climate crisis, allowing users to investigate accountability through distinct lenses: National Territories, Economic Sectors, and Corporate Producers ("Carbon Majors").
 
 ![Dashboard Preview](https://img.shields.io/badge/R-Shiny-blue?logo=r)
 ![Status](https://img.shields.io/badge/status-active-success)
 ![License](https://img.shields.io/badge/license-MIT-green)
 
-##  Features
+## Key Features
 
-###  Home Page
-- **Hero Section** with mission statement and overview
-- **Key Statistics** displaying current emission metrics
-- **Quick Navigation** cards to all dashboard sections
-- **Discovery Sections** highlighting key insights
+### 1. Global & Regional Analysis
+-   **Metric Inversion:** Instantly toggle between **Total Emissions**, **Per Capita**, and **Per GDP** to see how the global hierarchy shifts (e.g., verifying the "Great Divergence" between Global North and South).
+-   **Historical Trends:** Track emission trajectories from 1970 to 2023.
 
-### Global Trends
-- Interactive visualizations of worldwide emission patterns
-- Regional and country-specific comparisons
-- Time series analysis from 1900 to present
-- Per capita and per GDP emission metrics
+### 2. Interactive Map
+-   **Choropleth Visualization:** Explore emissions intensity spatially using Leaflet.
+-   **Accumulated Emissions:** Visualize the "weight of history" by mapping cumulative emissions since 1970, highlighting the historical debt of industrialized nations.
 
-### Interactive Map
-- Choropleth map showing emissions by country
-- Year-by-year animation capability
-- Multiple metric views (total, per capita, per GDP)
-- Hover tooltips with detailed information
+### 3. Sectoral Breakdown
+-   **Absolute & Relative Views:** Decompose national totals into 8 IPCC-defined sectors (Power, Buildings, Transport, etc.).
+-   **Chemical Composition:** View the specific breakdown of Greenhouse Gases ($CO_2$, $CH_4$, $N_2O$) for each sector via interactive Donut Charts.
+-   **Economic Structure:** Use Stacked Area charts to visualize the changing "energy mix" of a nation over time.
 
-### Sector Analysis
-- Breakdown of emissions by economic sector
-- Absolute and relative emission comparisons
-- Stacked area charts showing sector evolution
-- Industry-specific trends
+### 4. Corporate Analysis (Carbon Majors)
+-   **Supply-Side Focus:** Shifts attention to the 174 largest fossil fuel and cement producers.
+-   **Companies vs. World:** Quantify the market share of these corporate giants relative to global totals.
+-   **Animated Race Chart:** Watch the rise and fall of corporate empires (Standard Oil, British Coal) and the modern dominance of State-Owned Entities (Saudi Aramco, Gazprom) from 1900 to 2023.
 
-### Company Tracking
-- **Animated race chart** of top 10 emitting companies (1900-2022)
-- **Companies vs World comparison** showing corporate impact
-- Color-coded by primary commodity (Oil, Coal, Natural Gas, etc.)
-- Historical rankings and changes over time
+### 5. AI Analysis: The Sector Fingerprint
+-   **Structural DNA:** A novel **Radar Chart** (Spider Plot) that visualizes the "shape" of an economy.
+-   **Comparative Insight:** Compare the structural fingerprints of different nations (e.g., China's "Industrial Diamond" vs. USA's "Transport Spike") to understand underlying economic drivers.
+-   *Note: This visualization module was produced with the assistance of Generative AI (Google Gemini).*
 
-### About & Methodology
-- Detailed data source information
-- Methodology explanations
-- Data processing notes
-- Research questions addressed
-
-## Getting Started
-
-### Prerequisites
-
-- R (version 4.0 or higher)
-- RStudio (recommended)
-
-### Required R Packages
-
-```r
-install.packages(c(
-  "shiny",
-  "bslib",
-  "ggplot2",
-  "gganimate",
-  "dplyr",
-  "tidyr",
-  "leaflet",
-  "rnaturalearth",
-  "rnaturalearthdata",
-  "sf",
-  "countrycode",
-  "htmltools",
-  "scales",
-  "gifski"  # For GIF generation
-))
-```
-
-### Installation
-
-1. Clone the repository:
-```bash
-git clone https://github.com/NicolasLMP/Datavisualization.git
-cd Datavisualization
-```
-
-2. Open the project in RStudio or navigate to the directory in R
-
-3. Run the application:
-```r
-shiny::runApp()
-```
-
-## 📁 Project Structure
-
-```
-Datavisualization/
-├── app.R                          # Main application file
-├── pages/                         # Page modules
-│   ├── page_home.R               # Home page
-│   ├── page_regions.R            # Global trends page
-│   ├── page_heatmap.R            # Interactive map page
-│   ├── page_sectors.R            # Sector analysis page
-│   ├── page_companies.R          # Company tracking page
-│   └── page_about.R              # About page
-├── diagrams/                      # Visualization modules
-│   ├── emissions_by_region.R
-│   ├── global_heatmap.R
-│   ├── top_companies.R
-│   ├── emissions_by_sector_abs.R
-│   ├── emissions_by_sector_rel.R
-│   ├── emissions_by_sector_rel_stacked.R
-│   └── emissions_top_companies_vs_world.R
-├── scripts/                       # GIF generation scripts
-│   ├── generate_companies_gif.R
-│   └── generate_companies_vs_world_gif.R
-├── data/                          # Data directory
-│   └── data_cleaned/             # Processed datasets
-├── www/                           # Static assets (GIFs, images)
-└── README.md                      # This file
-```
-
-##  Design & Branding
-
-### Color Palette
-- **Primary Blue**: #1D3557 (atmosphere/sky)
-- **Accent Blue**: #457B9D (interactive elements)
-- **Teal**: #2A9D8F (sustainability)
-- **Red**: #E63946 (urgency/heat)
-- **Orange**: #F77F00 (energy)
-
-### Typography
-- **Font**: Inter (via Google Fonts)
-- **Style**: Clean, modern sans-serif
-
-## Data Sources
-
-- **EDGAR** (Emissions Database for Global Atmospheric Research)
-- **Global Carbon Project**
-- **Corporate emissions databases**
-- **Country-level economic indicators**
-
-**Coverage**: 1900-2022 | 195+ countries | Top 10 companies
-
-## Generating Animated GIFs
-
-The dashboard includes animated visualizations. To regenerate them:
-
-```r
-# Generate companies race chart
-source("scripts/generate_companies_gif.R")
-
-# Generate companies vs world comparison
-source("scripts/generate_companies_vs_world_gif.R")
-```
-
-**Note**: GIF generation requires the `gganimate` and `gifski` packages and may take 30-60 seconds per animation.
-
-## Customization
-
-### Changing Colors
-Edit the `bslib::bs_theme()` section in `app.R`:
-```r
-theme = bslib::bs_theme(
-  primary = "#457B9D",    # Change primary color
-  secondary = "#2A9D8F",  # Change secondary color
-  ...
-)
-```
-
-### Modifying Statistics
-Update the statistics cards in `pages/page_home.R` to reflect your data.
-
-## Research Questions Addressed
-
-- How have global emissions evolved since 1900?
-- Which countries and regions are the largest emitters?
-- How do emissions per capita and per GDP vary across countries?
-- What is the contribution of different economic sectors?
-- How do top companies' emissions compare to world totals?
-- How have corporate rankings changed over time?
-
-## Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
-
-## License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
-
-## Authors
-
-**Nicolas LMP**
-- GitHub: [@NicolasLMP](https://github.com/NicolasLMP)
-
-**Konstantin Blank**
-- GitHub: [@KonstantinBlank](https://github.com/KonstantinBlank)
-
-
-## Acknowledgments
-
-- Data providers: EDGAR, Global Carbon Project
-- R Shiny community
-- All contributors to the open-source packages used
-
-## Contact
-
-For questions or feedback, please open an issue on GitHub.
+### 6. Full Report
+-   **Downloadable Analysis:** Access the full PDF report directly from the dashboard, detailing methodology, data sources, and key findings.
 
 ---
 
-**Built with ❤️ using R Shiny**
+## Technology Stack
+
+-   **Language:** R (v4.0+)
+-   **Framework:** Shiny
+-   **Visualization:** `plotly` (Interactivity), `leaflet` (Mapping), `ggplot2` (Static), `gganimate` (GIFs).
+-   **UI/UX:** `bslib` (Theming).
+
+## Project Structure
+
+```
+Datavisualization/
+├── app.R                          # Main application entry point
+├── pages/                         # UI/Server Modules for each page
+│   ├── page_home.R               # Landing Page & Key Stats
+│   ├── page_regions.R            # Global Trends Line Charts
+│   ├── page_heatmap.R            # Interactive Leaflet Map
+│   ├── page_sectors.R            # Sectoral Deep-Dive
+│   ├── page_companies.R          # Carbon Majors Analysis
+│   ├── page_ai_analysis.R        # AI Radar Chart
+│   ├── page_download.R           # Report Download Page
+│   └── page_about.R              # Methodology & Sources
+├── diagrams/                      # Reusable Plotting Functions
+│   ├── emissions_by_region.R
+│   ├── global_heatmap.R
+│   ├── top_companies.R
+│   ├── ai_analysis.R             # Radar Chart Logic
+│   └── ...
+├── data/                          # Processed Datasets (CSV)
+│   └── data_cleaned/
+├── scripts/                       # Data Processing & GIF Generation
+│   ├── main_dp.R                 # ETL Pipeline Orchestrator
+│   └── generate_companies_gif.R  # Animation Script
+├── www/                           # Static Assets (Images, GIFs, PDF Report)
+└── final_report.tex               # LaTeX Source for the Report
+```
+
+## Design System
+
+The dashboard utilizes scientifically developed, colorblind-safe palettes to ensure accessibility:
+
+-   **Theme:** Okabe-Ito Blue (`#0072B2`) for primary UI elements.
+-   **Categorical Data:** **Okabe-Ito Palette** (8 hues) for distinguishable sectors and regions.
+-   **Sequential Data:** **Value-Linked Heat Scale** (Yellow-to-Red) for identifying emission hotspots.
+
+## Installation & Usage
+
+1.  **Clone the repository:**
+    ```bash
+    git clone https://github.com/NicolasLMP/Datavisualization.git
+    cd Datavisualization
+    ```
+
+2.  **Install Dependencies:**
+    Open `Datavisualization.Rproj` in RStudio and run:
+    ```r
+    install.packages(c("shiny", "bslib", "plotly", "leaflet", "tidyverse", "sf", "countrycode"))
+    ```
+
+3.  **Run the App:**
+    ```r
+    shiny::runApp()
+    ```
+
+## Data Sources
+
+1.  **EDGAR (v8.0):** Country and Sectoral emissions (1970-2023).
+2.  **Carbon Majors Database:** Corporate production data (1854-2023).
+3.  **Our World In Data:** Global historical baselines.
+4.  **World Bank:** GDP and Population metrics.
+
+## Team
+
+**University of Southern Denmark** | *Data Visualisation*
+
+*   **Nicolas Lambropoulos**
+*   **Konstantin Blank**
+
+---
+*Built in R Shiny.*
