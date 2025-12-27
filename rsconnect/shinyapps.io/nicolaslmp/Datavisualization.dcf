@@ -5,7 +5,7 @@ account: nicolaslmp
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 16353227
-bundleId:
+bundleId: 11371680
 url: https://nicolaslmp.shinyapps.io/Datavisualization/
 version: 1
 asMultiple: FALSE

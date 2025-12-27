@@ -53,14 +53,14 @@ mod_page_ai_analysis_ui <- function(id) {
                 hr(),
                 wellPanel(
                     style = "background-color: #f8f9fa;",
-                    h4("AI Insights", style = "color: #2c3e50; font-weight: bold;"),
-                    tags$p("This interactive chart reveals the structural DNA of each economy at a glance."),
-                    tags$ul(
-                        tags$li(tags$strong("China:"), " Typically heavy in Power & Industry."),
-                        tags$li(tags$strong("USA:"), " Often shows a distinct Transport spike."),
-                        tags$li(tags$strong("Developing Nations:"), " May show larger Agriculture shares.")
+                    h4("Research Question", style = "color: #2c3e50; font-weight: bold;"),
+                    tags$p("This specific graph was designed to answer the following research question:", style = "font-style: italic; color: #555;"),
+                    tags$blockquote(
+                        style = "border-left: 5px solid #0072B2; margin: 20px 0; padding: 10px 20px; background: #f1f1f1; font-size: 1.1em;",
+                        tags$strong("Do nations with similar total emission levels share the same underlying economic structure?")
                     ),
-                    tags$p("Use the controls on the left to travel through time or compare different regions.")
+                    tags$p("The visualization reveals the answer is often ", tags$strong("no.")),
+                    tags$p("By comparing the 'shapes' of high-emitting nations, the dashboard demonstrates distinct structural realities (e.g., China's 'Industrial Diamond' shape vs. the USA's 'Transport-Heavy' shape), implying that decarbonization strategies must be tailored to these fingerprints.")
                 )
             )
         )
