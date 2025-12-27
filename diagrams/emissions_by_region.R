@@ -3,6 +3,8 @@ library(plotly)
 library(dplyr)
 library(tidyr)
 library(countrycode)
+library(khroma)
+
 
 # Chargement et préparation des données (peut être mutualisé)
 # Updated path to cleaned data
@@ -76,7 +78,18 @@ mod_emissions_by_region_server <- function(id, continents, countries, metric, ye
         country_filtered <- .country_data |> dplyr::filter(country %in% countries(), year <= year_control())
       }
 
-      continent_colors <- c("Africa" = "#D2691E", "Asia" = "#DC143C", "Europe" = "#4169E1", "Americas" = "#228B22", "Oceania" = "#9370DB")
+      
+      # Generate 5 colors from the 'bright' scheme
+      pt_bright_5 <- as.character(color("bright")(5))
+      
+      # Create the fixed mapping for continents
+      continent_colors <- c(
+        "Europe"   = pt_bright_5[1], # Blue
+        "Asia"     = pt_bright_5[2], # Red
+        "Americas"   = pt_bright_5[3], # Green
+        "Africa" = pt_bright_5[4], # Yellow
+        "Oceania"  = pt_bright_5[5]  # Cyan
+      )
       plot <- plot_ly()
 
       if (!is.null(continent_filtered) && nrow(continent_filtered) > 0) {
@@ -132,13 +145,54 @@ mod_emissions_by_region_server <- function(id, continents, countries, metric, ye
         }
       }
 
+      # Define metric explanations
+      metric_explanation <- switch(metric(),
+        "total" = "Total greenhouse gas emissions in Million tonnes of CO2 equivalent (MtCO2e).",
+        "per_capita" = "Average emissions per person (tCO2e/capita).",
+        "per_gdp" = "Emissions intensity relative to economic output (tCO2e/million $ GDP).",
+        "accumulated" = "Cumulative sum of annual emissions from start of dataset up to selected year."
+      )
+
+      # Update layout for titles, explanations, and axis lines
       plot |>
         layout(
-          xaxis = list(title = "Year", gridcolor = "#E5E5E5", range = c(1970, year_control())),
-          yaxis = list(title = metric_label, gridcolor = "#E5E5E5", rangemode = "tozero"),
+          title = list(
+            text = "How have emissions evolved over time?",
+            x = 0.05
+          ),
+          xaxis = list(
+            title = "Year",
+            gridcolor = "#E5E5E5",
+            range = c(1970, year_control()),
+            showline = TRUE,
+            linewidth = 2,
+            linecolor = "black",
+            mirror = FALSE # Only bottom line
+          ),
+          yaxis = list(
+            title = metric_label,
+            gridcolor = "#E5E5E5",
+            rangemode = "tozero",
+            showline = TRUE,
+            linewidth = 2,
+            linecolor = "black",
+            mirror = FALSE # Only left line
+          ),
+          annotations = list(
+            list(
+              x = 0,
+              y = 1.08,
+              xref = "paper",
+              yref = "paper",
+              text = paste0("<i>", metric_explanation, "</i>"),
+              showarrow = FALSE,
+              font = list(size = 12, color = "gray")
+            )
+          ),
           hovermode = "closest",
           legend = list(orientation = "v", x = 1.02, y = 1, bgcolor = "rgba(255,255,255,0.8)"),
-          plot_bgcolor = "#F8F9FA", paper_bgcolor = "#FFFFFF"
+          plot_bgcolor = "#F8F9FA", paper_bgcolor = "#FFFFFF",
+          margin = list(t = 80) # Add margin for title/explanation
         )
     })
   })

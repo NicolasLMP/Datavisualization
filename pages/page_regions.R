@@ -3,129 +3,92 @@
 mod_page_regions_ui <- function(id) {
     ns <- NS(id)
     tagList(
-        titlePanel("Global emissions by continents and countries"),
-
-        # Comparison mode checkbox
-        checkboxInput(ns("comparison_mode"), "Enable side-by-side comparison", value = FALSE),
-        conditionalPanel(
-            condition = sprintf("!input['%s']", ns("comparison_mode")),
-            # Single plot mode
-            sidebarLayout(
-                sidebarPanel(
-                    width = 3,
-                    h4("Select Regions"),
-                    selectInput(ns("continents"), "Continents:",
+        titlePanel("What are the emissions of the continents and countries?"),
+        sidebarLayout(
+          sidebarPanel(
+            width = 3,
+            # Custom CSS to style the Play Button and Slider in Navy/Okabe Blue
+            tags$head(
+              tags$style(HTML(sprintf("
+      /* Style the slider bar and handle */
+      .js-irs-0 .irs-bar { background: #1D3557; border-top: 1px solid #1D3557; border-bottom: 1px solid #1D3557; }
+      .js-irs-0 .irs-from, .js-irs-0 .irs-to, .js-irs-0 .irs-single { background: #1D3557; }
+      .js-irs-0 .irs-handle { border: 1px solid #1D3557; background-color: white; }
+      
+      /* Style the Play Button */
+      .slider-animate-container .slider-animate-button {
+        color: #1D3557 !important;
+        font-size: 24px;
+        transition: transform 0.2s ease-in-out;
+      }
+      .slider-animate-container .slider-animate-button:hover {
+        color: #0072B2 !important; /* Okabe Blue on hover */
+        transform: scale(1.1);
+      }
+      
+      /* Nicer help text grouping */
+      .help-block-container { 
+        display: flex; 
+        align-items: center; 
+        margin-top: 10px; 
+        background: #f0f7fb; 
+        padding: 8px; 
+        border-radius: 6px;
+      }
+    ")))
+            ),
+            
+            selectInput(ns("continents"), "Select continents:",
                         choices = c("Africa", "Americas", "Asia", "Europe", "Oceania"),
                         selected = c("Europe", "Asia"), multiple = TRUE
-                    ),
-                    selectInput(ns("countries"), "Countries :",
+            ),
+            selectInput(ns("countries"), "Select countries:",
                         choices = NULL,
                         selected = NULL, multiple = TRUE
-                    ),
-                    hr(),
-                    h4("Metric"),
-                    radioButtons(ns("metric"), NULL,
-                        choices = c(
-                            "Total Emissions" = "total",
-                            "Per Capita" = "per_capita",
-                            "Per GDP" = "per_gdp",
-                            "Total Accumulated" = "accumulated"
-                        ),
-                        selected = "total"
-                    ),
-                    hr(),
-                    h4("Time Control"),
-                    sliderInput(ns("year_control"), "Show data through year:",
+            ),
+            hr(),
+            radioButtons(ns("metric"), "Select metric:",
+                         choices = c(
+                           "Total Emissions" = "total",
+                           "Per Capita" = "per_capita",
+                           "Per GDP" = "per_gdp",
+                           "Total Accumulated" = "accumulated"
+                         ),
+                         selected = "total"
+            ),
+            hr(),
+            sliderInput(ns("year_control"), "Watch the evolution over the years:",
                         min = 1970, max = 2023, value = 2023, step = 1, sep = "",
                         animate = animationOptions(interval = 500, loop = FALSE)
-                    ),
-                    helpText("Click play to animate changes year by year"),
-                    conditionalPanel(
-                        condition = sprintf("input['%s'] == 'per_gdp'", ns("metric")),
-                        helpText("Note: Per GDP data only available from 1990 onwards")
-                    )
-                ),
-                mainPanel(
-                    width = 9,
-                    mod_emissions_by_region_ui(ns("emissions_plot")),
-                    hr(),
-                    wellPanel(
-                        style = "background-color: #f8f9fa;",
-                        h4("Research questions", style = "color: #2c3e50;"),
-                        tags$ul(
-                            tags$li("How do GHG emissions evolve over time for different continents/countries?"),
-                            tags$li("Who are the largest emitters in absolute value vs per capita vs per GDP?"),
-                            tags$li("How do cumulative emissions compare between countries?"),
-                            tags$li("What are the trends of increase or reduction in emissions?"),
-                            tags$li("Which regions/countries are decoupling emissions from economic growth?")
-                        )
-                    )
-                )
-            )
-        ),
-        conditionalPanel(
-            condition = sprintf("input['%s']", ns("comparison_mode")),
-            # Side-by-side comparison mode
-            fluidRow(
-                column(
-                    6,
-                    wellPanel(
-                        h4("Plot 1 Settings"),
-                        selectInput(ns("continents1"), "Continents:",
-                            choices = c("Africa", "Americas", "Asia", "Europe", "Oceania"),
-                            selected = c("Europe"), multiple = TRUE
-                        ),
-                        selectInput(ns("countries1"), "Countries :",
-                            choices = NULL,
-                            selected = NULL, multiple = TRUE
-                        ),
-                        radioButtons(ns("metric1"), "Metric:",
-                            choices = c(
-                                "Total Emissions" = "total",
-                                "Per Capita" = "per_capita",
-                                "Per GDP" = "per_gdp",
-                                "Total Accumulated" = "accumulated"
-                            ),
-                            selected = "total"
-                        )
-                    ),
-                    mod_emissions_by_region_ui(ns("emissions_plot1"))
-                ),
-                column(
-                    6,
-                    wellPanel(
-                        h4("Plot 2 Settings"),
-                        selectInput(ns("continents2"), "Continents:",
-                            choices = c("Africa", "Americas", "Asia", "Europe", "Oceania"),
-                            selected = c("Asia"), multiple = TRUE
-                        ),
-                        selectInput(ns("countries2"), "Countries :",
-                            choices = NULL,
-                            selected = NULL, multiple = TRUE
-                        ),
-                        radioButtons(ns("metric2"), "Metric:",
-                            choices = c(
-                                "Total Emissions" = "total",
-                                "Per Capita" = "per_capita",
-                                "Per GDP" = "per_gdp",
-                                "Total Accumulated" = "accumulated"
-                            ),
-                            selected = "per_capita"
-                        )
-                    ),
-                    mod_emissions_by_region_ui(ns("emissions_plot2"))
-                )
             ),
-            fluidRow(
-                column(
-                    12,
-                    wellPanel(
-                        h4("Shared Time Control"),
-                        sliderInput(ns("year_control_compare"), "Show data through year:",
-                            min = 1970, max = 2023, value = 2023, step = 1, sep = "",
-                            animate = animationOptions(interval = 500, loop = FALSE)
-                        ),
-                        helpText("This time control applies to both plots")
+            
+            # Styled Tip Section
+            tags$div(class = "help-block-container",
+                     tags$span(icon("circle-info"), style = "margin-right: 10px; font-size: 1.2em;"),
+                     helpText("Tip: Click play to animate changes year by year.", style = "margin: 0;")
+            ),
+            
+            conditionalPanel(
+              condition = sprintf("input['%s'] == 'per_gdp'", ns("metric")),
+              tags$div(class = "help-block-container",
+                       tags$span(icon("circle-info"), style = "margin-right: 10px; font-size: 1.2em;"),
+                       helpText("Note: Per GDP data is only available from 1990 onwards.", style = "margin: 0;")
+              )
+            )
+          ),
+            mainPanel(
+                width = 9,
+                mod_emissions_by_region_ui(ns("emissions_plot")),
+                hr(),
+                wellPanel(
+                  style = "background-color: #fcfcfc; border-left: 5px solid #0072B2;",
+                  h4("Research questions", style = "font-weight: bold;"),
+                    tags$ul(
+                        tags$li("How do GHG emissions evolve over time for different continents/countries?"),
+                        tags$li("Who are the largest emitters in absolute value vs per capita vs per GDP?"),
+                        tags$li("How do cumulative emissions compare between countries?"),
+                        tags$li("What are the trends of increase or reduction in emissions?"),
+                        tags$li("Which regions/countries are decoupling emissions from economic growth?")
                     )
                 )
             )
@@ -152,24 +115,6 @@ mod_page_regions_server <- function(id) {
             countries = reactive(input$countries),
             metric = reactive(input$metric),
             year_control = reactive(input$year_control)
-        )
-
-        # Comparison mode - Plot 1
-        mod_emissions_by_region_server(
-            id = "emissions_plot1",
-            continents = reactive(input$continents1),
-            countries = reactive(input$countries1),
-            metric = reactive(input$metric1),
-            year_control = reactive(input$year_control_compare)
-        )
-
-        # Comparison mode - Plot 2
-        mod_emissions_by_region_server(
-            id = "emissions_plot2",
-            continents = reactive(input$continents2),
-            countries = reactive(input$countries2),
-            metric = reactive(input$metric2),
-            year_control = reactive(input$year_control_compare)
         )
     })
 }
