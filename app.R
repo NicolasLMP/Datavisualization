@@ -41,7 +41,7 @@ source("pages/page_regions.R")
 source("pages/page_heatmap.R")
 source("pages/page_sectors.R")
 source("pages/page_companies.R")
-source("pages/page_about.R")
+
 source("pages/page_download.R")
 source("pages/page_ai_analysis.R")
 
@@ -126,11 +126,7 @@ ui <- navbarPage(
     icon = icon("file-download"),
     fluidPage(mod_page_download_ui("download"))
   ),
-  tabPanel(
-    "About",
-    icon = icon("info-circle"),
-    fluidPage(mod_page_about_ui("page_about"))
-  ),
+
   # Footer
   tags$div(
     tags$p(
@@ -153,7 +149,6 @@ server <- function(input, output, session) {
   mod_page_companies_server("companies")
   mod_page_ai_analysis_server("ai_analysis")
   mod_page_download_server("download")
-  mod_page_about_server("about")
 }
 
 shinyApp(ui, server)

@@ -1,0 +1,13 @@
+name: Datavisualization
+title: Datavisualization
+username: nicolaslmp
+account: nicolaslmp
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 16353227
+bundleId:
+url: https://nicolaslmp.shinyapps.io/Datavisualization/
+version: 1
+asMultiple: FALSE
+asStatic: FALSE
+ignoredFiles: README.md
